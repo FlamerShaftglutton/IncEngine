@@ -4,9 +4,29 @@ class MessageQueue
   int mq_size;
   float h;
   
+  MessageQueue()
+  {
+    mq = new Message[10];
+    mq_size = 0;
+    h = height;
+  }
+  
   void add_message(String _message)
   {
-    mq[mq_size] = new Message(_message, settings.mq_lifetime);
+    if (_message == null || _message.length() == 0 || (mq_size > 0 && _message.equals(mq[mq_size - 1].original_text)))
+      return;
+    
+    if (mq_size == mq.length)
+    {
+      //shift everyone down a space, destroying the oldest
+      for (int i = 1; i < mq.length; i++)
+        mq[i-1] = mq[i];
+      
+      --mq_size;
+    }
+    
+    mq[mq_size] = new Message(_message, settings.mq_lifetime, settings.mq_width - 2.0f * settings.mq_text_size);
+    ++mq_size;
   }
   
   void display(float delta)
@@ -31,7 +51,7 @@ class MessageQueue
       mq_size -= first_live;
     
     //now draw them all
-    float yy = settings.mq_text_size;
+    float yy = settings.mq_text_size * 2;
     for (int i = mq_size - 1; i >= 0; i--)
     {
       mq[i].display(settings.mq_text_size, yy);
@@ -43,25 +63,46 @@ class MessageQueue
 
 class Message
 {
+  String original_text;
   String[] text_lines;
   float  lifetime;
+  float  max_lifetime;
   float  h;
   
-  Message(String _mtext, float _lifetime)
+  Message(String _mtext, float _lifetime, float _effective_width)
   {
-    lifetime = _lifetime;
+    lifetime = max_lifetime = _lifetime;
+    original_text = _mtext;
     
     StringList lines = new StringList();
     
     int ppos = 0;
-    for (int pos = _mtext.indexOf(' '); pos < _mtext.length() && pos >= 0; pos = _mtext.indexOf(' ', pos + 1))
-    {
-      //TODO: test the width of the string
-      
-      //TODO: if it's too long, use ppos to make a substring. Add the substring to the list of lines and set _mtext to the rest of the string
-    }
+    int pos = 0;
     
-    //TODO: test the final substring
+    while (_mtext.length() > 0)
+    {
+      pos = _mtext.indexOf(' ', pos + 1);
+      if (pos < 0)
+        pos = _mtext.length();
+      
+      if (textWidth(_mtext.substring(0,pos)) > _effective_width)
+      {
+        //if it's just one long word, spit it out anyway and let the user grumble
+        if (ppos == 0)
+          ppos = pos;
+        
+        lines.append(trim(_mtext.substring(0,ppos)));
+        _mtext = trim(_mtext.substring(ppos));
+        ppos = pos = 0;
+      }
+      else if (pos == _mtext.length())
+      {
+        lines.append(trim(_mtext));
+        _mtext = "";
+      }
+      else
+        ppos = pos;
+    }
     
     text_lines = lines.array();
     h = lines.size() * settings.mq_text_size;
@@ -69,8 +110,9 @@ class Message
   
   void display(float x, float y)
   {
+    tint(255);
     textSize(settings.mq_text_size);
-    fill(settings.default_text_color);
+    fill(settings.default_text_color, constrain(lifetime / max_lifetime,0.0f, 1.0f) * 255.0f);
     
     for (int i = 0; i < text_lines.length; i++)
       text(text_lines[i],x,y + (float)i * settings.mq_text_size);

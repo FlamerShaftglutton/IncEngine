@@ -2,6 +2,7 @@ Resource[] resources;
 Button[] buttons;
 ArrayList<Worker> workers;
 Settings settings;
+MessageQueue message_queue;
 
 int dragged_worker_index;
 PImage worker_sprite;
@@ -18,14 +19,20 @@ void setup()
   
   if (f.exists())
   {
-    println("Found Save Game File, loading saved game");
     import_from_xml("SavedGame.xml");
+    
+    if (settings.debugging)
+      println("Found Save Game File, loading saved game");
   }
   else
   {
-    println("Unable to find Saved Game file, loading new game");
     import_from_xml("NewGame.xml");
+    
+    if (settings.debugging)
+      println("Unable to find Saved Game file, loading new game");
   }
+  
+  message_queue = new MessageQueue();
   
   worker_sprite = loadImage(settings.worker_sprite_path);
   
@@ -50,7 +57,7 @@ void draw()
   
   float delta = settings.time_multiplier * float(ctime - ptime) / 1000.0f;
   
-  float y = 50.0f;
+  float y = settings.default_text_size;
   for (Button b : buttons)
   {
     b.update(delta);
@@ -58,7 +65,7 @@ void draw()
     if (b.visible && b.hideuntil == null)
     {
       b.y = y;
-      y += 50.0f;
+      y += settings.default_text_size * 2.0f;
     }
     else
     {
@@ -70,19 +77,19 @@ void draw()
   
   noTint();
   fill(settings.default_text_color);
-  y = 50.0f;
+  y = settings.default_text_size * 2.0f;
   textSize(settings.default_text_size);
   for (Resource r : resources)
   {
     if (r.visible() || settings.debugging)
     {
-      text(r.value + " " + r.get_name(), width - 200.0f, y);
-      y += 50.0f;
+      text(r.get_value() + " " + r.get_name(), width - 200.0f, y);
+      y += settings.default_text_size * 1.5f;
     }
   }
   
   //create new workers (if need be)
-  while (workers.size() < resources[crew_type_index].value)
+  while (workers.size() < resources[crew_type_index].get_value())
   {
     workers.add(new Worker());
   }
@@ -129,13 +136,21 @@ void draw()
       break;
   }
   
+  //draw the message queue
+  message_queue.display(delta);
+  
   //save the game if necessary
   if (ctime - psavetime > 10000)
   {
     psavetime = ctime;
-    println("Saving Game...");
+    
+    if (settings.debugging)
+      println("Saving Game...");
+    
     export_to_xml("SavedGame.xml");
-    println("Done saving, time taken was ", millis() - ctime, " milliseconds");
+    
+    if (settings.debugging)
+      println("Done saving, time taken was ", millis() - ctime, " milliseconds");
   }
   ptime = ctime;
 }

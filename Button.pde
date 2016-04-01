@@ -169,7 +169,7 @@ class Button
         boolean has_costs = true;
         for (int j = 0; j < converter.click.types.length; j++)
         {
-          if (converter.click.types[j] != player_type_index && resources[converter.click.types[j]].value + converter.click.values[j].evaluate() < 0)
+          if (converter.click.types[j] != player_type_index && resources[converter.click.types[j]].get_value() + converter.click.values[j].evaluate() < 0)
           {
             has_costs = false;
             break;
@@ -197,6 +197,9 @@ class Button
         else
           cooldown.current_worker_amount = 0.0f;
       }
+      
+      if (has_active_workers)
+        message_queue.add_message(converter.click_message);
     }
   }
   
@@ -211,12 +214,14 @@ class Button
           for (int j = 0; j < converter.reset.types.length; j++)
           {
             if (converter.reset.types[j] != player_type_index)
-              resources[converter.reset.types[j]].value += converter.reset.values[j].evaluate();
+              resources[converter.reset.types[j]].add_value(converter.reset.values[j].evaluate());
           }
         }
         
         workers.get(myworkers.get(i)).click_paid = null;
       }
+      
+      message_queue.add_message(converter.reset_message);
     }
   }
   
@@ -271,13 +276,6 @@ class Button
     {
       //check if the hideuntils have been met
       boolean met = hideuntil.met();
-      /*
-      for (int i = 0; met && i < hideuntil.list.types.length; i++)
-      {
-        if (resources[hideuntil.list.types[i]].value < hideuntil.list.values[i].evaluate())
-          met = false;
-      }
-      */
       if (met)
       {
         hideuntil = null;
@@ -289,14 +287,6 @@ class Button
     if (hideafter != null)
     {
       //check if the hideuntils have been met
-      /*
-      boolean met = true;
-      for (int i = 0; met && i < hideafter.list.types.length; i++)
-      {
-        if (resources[hideafter.list.types[i]].value < hideafter.list.values[i].evaluate())
-          met = false;
-      }
-      */
       if (hideafter.met())
       {
         hideafter = null;
@@ -362,7 +352,7 @@ class Button
         enabled = true;
         for (int i = 0; i < converter.click.types.length; i++)
         {
-          if (resources[converter.click.types[i]].value + converter.click.values[i].evaluate() < 0)
+          if (resources[converter.click.types[i]].get_value() + converter.click.values[i].evaluate() < 0)
           {
             enabled = false;
             break;
@@ -406,20 +396,22 @@ class Button
   void on_click()
   {
     boolean met = cooldown == null || cooldown.current_amount <= 0.0f;
-    if (converter != null)
+    if (converter != null && converter.click != null)
     {
       //first off, make sure we meet the requirements (this is normally covered in the 'update' step, but this covers all edge cases
       for (int i = 0; i < converter.click.types.length && met; i++)
       {
-        met &= resources[converter.click.types[i]].value + converter.click.values[i].evaluate() >= 0;
+        met &= resources[converter.click.types[i]].get_value() + converter.click.values[i].evaluate() >= 0;
       }
     
       if (met)
       {
         for (int i = 0; i < converter.click.types.length; i++)
         {
-          resources[converter.click.types[i]].value += converter.click.values[i].evaluate();
+          resources[converter.click.types[i]].add_value(converter.click.values[i].evaluate());
         }
+        
+        message_queue.add_message(converter.click_message);
       }
     }
     
@@ -432,12 +424,14 @@ class Button
   
   void on_reset()
   {
-    if (converter != null)
+    if (converter != null && converter.reset != null)
     {
       for (int i = 0; i < converter.reset.types.length; i++)
       {
-        resources[converter.reset.types[i]].value += converter.reset.values[i].evaluate();
+        resources[converter.reset.types[i]].add_value(converter.reset.values[i].evaluate());
       }
+      
+      message_queue.add_message(converter.reset_message);
     }
   }
 }
@@ -467,26 +461,37 @@ class Cooldown
 class Prerequisite
 {
   ResourceSet list;
+  boolean all;
   
-  Prerequisite(ResourceSet _list)
+  Prerequisite(ResourceSet _list, boolean _all)
   {
     list = _list;
+    
+    all = _all;
   }
   
-  Prerequisite(String _input)
+  Prerequisite(String _input, boolean _all)
   {
-    list = new ResourceSet(_input);
+    this(new ResourceSet(_input), _all);
   }
   
   boolean met()
   {
     for (int i = 0; i < list.types.length; i++)
     {
-      if (resources[list.types[i]].value < list.values[i].evaluate())
-        return false;
+      if (all)
+      {
+        if (resources[list.types[i]].get_alltime_amount() < list.values[i].evaluate())
+          return false;
+      }
+      else
+      {
+        if (resources[list.types[i]].get_alltime_amount() >= list.values[i].evaluate())
+          return true;
+      }
     }
       
-    return true;
+    return all;
   }
 }
 
@@ -495,15 +500,24 @@ class Converter
   ResourceSet click;
   ResourceSet reset;
   
-  Converter(ResourceSet _click, ResourceSet _reset)
+  String click_message;
+  String reset_message;
+  
+  Converter(ResourceSet _click, ResourceSet _reset, String _click_message, String _reset_message)
   {
     click = _click;
     reset = _reset;
+    
+    click_message = _click_message;
+    reset_message = _reset_message;
   }
   
-  Converter(String _click, String _reset)
+  Converter(String _click, String _reset, String _click_message, String _reset_message)
   {
     click = _click.equals("") ? null : new ResourceSet(_click);
     reset = _reset.equals("") ? null : new ResourceSet(_reset);
+    
+    click_message = _click_message;
+    reset_message = _reset_message;
   }
 }

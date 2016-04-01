@@ -41,7 +41,7 @@ class Worker
       for (int j = 0; j < click_paid.types.length; j++)
       {
         if (click_paid.types[j] != player_type_index)
-          resources[click_paid.types[j]].value -= click_paid.values[j].evaluate();
+          resources[click_paid.types[j]].add_value(-click_paid.values[j].evaluate());
       }
       
       click_paid = null;
@@ -55,7 +55,7 @@ class Worker
       for (int j = 0; j < click_paid.types.length; j++)
       {
         if (click_paid.types[j] != player_type_index)
-          resources[click_paid.types[j]].value += click_paid.values[j].evaluate();
+          resources[click_paid.types[j]].add_value(click_paid.values[j].evaluate());
       }
     }
   }

@@ -108,10 +108,11 @@ void import_resources_from_xml(XML xml)
   resources = new Resource[xresources.length];
   for (int i = 0; i < xresources.length; i++)
   {
-    String singular_name = "";
-    String plural_name   = "";
-    int    min_value     = 0;
-    int    value         = 0;
+    String singular_name   = "";
+    String plural_name     = "";
+    int    min_value       = 0;
+    int    value           = 0;
+    int    alltime_amount = 0;
     
     String[] chunks = split(xresources[i].getContent(), ",");
     singular_name = trim(chunks[0]);
@@ -122,12 +123,15 @@ void import_resources_from_xml(XML xml)
       plural_name = trim(chunks[0]);
     
     if (xresources[i].hasAttribute("min"))
-      min_value = int(xresources[i].getString("min"));
+      min_value = xresources[i].getInt("min");
     
     if (xresources[i].hasAttribute("value"))
-      value = int(xresources[i].getString("value"));
+      value = xresources[i].getInt("value");
     
-    resources[i] = new Resource(min_value,value,singular_name,plural_name);
+    if (xresources[i].hasAttribute("all_time"))
+      alltime_amount = xresources[i].getInt("alltime");
+    
+    resources[i] = new Resource(min_value,value,singular_name,plural_name, max(alltime_amount,value));
   }
 }
 
@@ -144,8 +148,8 @@ void import_buttons_from_xml(XML xml)
     String  title = "?";
     String  tooltip = "";
     
-    float   x = xbuttons[i].getFloat("x",50.0f);
-    float   y = xbuttons[i].getFloat("y",float(i + 1) * 50.0f);
+    float   x = xbuttons[i].getFloat("x",settings.default_text_size + settings.mq_width);
+    float   y = xbuttons[i].getFloat("y",float(i + 1) * settings.default_text_size * 1.5f);
     float   w = xbuttons[i].getFloat("width",-1.0f);
     float   h = xbuttons[i].getFloat("height",-1.0f);
     float   text_height = xbuttons[i].getFloat("text_height",1.0f);
@@ -168,12 +172,16 @@ void import_buttons_from_xml(XML xml)
     boolean converter = false;
     String  click_innards = "";
     String  reset_innards = "";
+    String  click_message = "";
+    String  reset_message = "";
     
     boolean hideuntil = false;
     String  hideuntil_innards = "";
+    boolean hideuntil_all = false;
     
     boolean hideafter = false;
     String  hideafter_innards = "";
+    boolean hideafter_all = false;
     
     IntList worker_list = new IntList();
     
@@ -217,11 +225,13 @@ void import_buttons_from_xml(XML xml)
       {
         hideuntil = true;
         hideuntil_innards = kid.getContent();
+        hideuntil_all = kid.getString("all","false").equals("true");
       }
       else if (n.equals("hideafter"))
       {
         hideafter = true;
         hideafter_innards = kid.getContent();
+        hideafter_all = kid.getString("all","false").equals("true");
       }
       else if (n.equals("tooltip"))
       {
@@ -234,10 +244,16 @@ void import_buttons_from_xml(XML xml)
         XML kreset = kid.getChild("reset");
         
         if (kclick != null)
+        {
           click_innards = kclick.getContent();
+          click_message = kclick.getString("message","");
+        }
         
         if (kreset != null)
+        {
           reset_innards = kreset.getContent();
+          reset_message = kreset.getString("message","");
+        }
       }
       else if (n.equals("workers"))
       {
@@ -259,13 +275,13 @@ void import_buttons_from_xml(XML xml)
       buttons[i].cooldown = new Cooldown(cooldown_current_amount,cooldown_max_amount,cooldown_display,cooldown_worker_amount);
     
     if (hideuntil)
-      buttons[i].hideuntil = new Prerequisite(hideuntil_innards);
+      buttons[i].hideuntil = new Prerequisite(hideuntil_innards,hideuntil_all);
       
     if (hideafter)
-      buttons[i].hideafter = new Prerequisite(hideafter_innards);
+      buttons[i].hideafter = new Prerequisite(hideafter_innards,hideafter_all);
     
     if (converter)
-      buttons[i].converter = new Converter(click_innards, reset_innards);
+      buttons[i].converter = new Converter(click_innards, reset_innards, click_message, reset_message);
     
     buttons[i].myworkers = worker_list;
   }

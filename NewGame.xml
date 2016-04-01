@@ -1,5 +1,6 @@
 <game>
 	<buttons>
+		<!--Tier 0 buttons-->
 		<button>
 			<title>Harvest Fuel</title>
 			<converter>
@@ -7,26 +8,28 @@
 				<reset>1 Player, 20 Fuel</reset>
 			</converter>
 			<cooldown>1</cooldown>
+			<hideafter>1 Tier</hideafter>
 			<tooltip>Spend time harvesting fuel from the space surrounding the station.</tooltip>
 		</button>
 		<button>
 			<title>Mine an Asteroid</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -50 Fuel</click>
-				<reset>1 Player, 1 Ship, random(80,120) Ore</reset>
+				<click>-1 Player, -1 Free Ship, -50 Fuel</click>
+				<reset>1 Player, 1 Free Ship, random(80,120) Ore</reset>
 			</converter>
 			<cooldown>5</cooldown>
+			<hideafter>1 Tier</hideafter>
 			<tooltip>Take a ship out to the asteroid field for some ore.</tooltip>
 		</button>
 		<button>
 			<title>Harvest Organics</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -50 Fuel</click>
-				<reset>1 Player, 1 Ship, random(50, 200) Organics</reset>
+				<click>-1 Player, -1 Free Ship, -50 Fuel</click>
+				<reset>1 Player, 1 Free Ship, random(50, 200) Organics</reset>
 			</converter>
 			<cooldown>5</cooldown>
 			<hideuntil>2 Crew</hideuntil>
-			<hideafter>1 Greenhouse</hideafter>
+			<hideafter>1 Greenhouse, 1 Tier</hideafter>
 			<tooltip>"Harvest" some organic molecules from a nearby planet</tooltip>
 		</button>
 		<button>
@@ -36,49 +39,52 @@
 				<reset>1 Player, random(100,150) Organics</reset>
 			</converter>
 			<hideuntil>1 Greenhouse</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<cooldown>3</cooldown>
 			<tooltip>Use some fuel to grow some organics.</tooltip>
 		</button>
 		<button>
 			<title>Sell 1000 Ore</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -50 Fuel, -1000 Ore</click>
-				<reset>1 Player, 1 Ship, random(200,250) Money</reset>
+				<click>-1 Player, -1 Free Ship, -50 Fuel, -1000 Ore</click>
+				<reset>1 Player, 1 Free Ship, random(200,250) Money</reset>
 			</converter>
 			<cooldown>10</cooldown>
 			<hideuntil>500 Ore</hideuntil>
-			<hideafter>1 Furnace</hideafter>
+			<hideafter>1 Furnace, 1 Tier</hideafter>
 			<tooltip>Take a ship to the nearest planet to sell some ore.</tooltip>
 		</button>
 		<button>
 			<title>Sell 1000 Organics</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -50 Fuel, -1000 Organics</click>
-				<reset>1 Player, 1 Ship, random(200,250) Money</reset>
+				<click>-1 Player, -1 Free Ship, -50 Fuel, -1000 Organics</click>
+				<reset>1 Player, 1 Free Ship, random(200,250) Money</reset>
 			</converter>
 			<hideuntil>50 Organics</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<cooldown>10</cooldown>
 			<tooltip>Sell some organics for food or something.</tooltip>
 		</button>
 		<button>
 			<title>Sell 500 Steel</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -50 Fuel, -500 Steel</click>
-				<reset>1 Player, 1 Ship, random(400,500) Money</reset>
+				<click>-1 Player, -1 Free Ship, -50 Fuel, -500 Steel</click>
+				<reset>1 Player, 1 Free Ship, random(400,500) Money</reset>
 			</converter>
 			<cooldown>10</cooldown>
 			<hideuntil>400 Steel</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<tooltip>Take a ship to the nearest planet to sell some steel.</tooltip>
 		</button>
 		<button>
 			<title>Convert Ore to Steel</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -50 Fuel, -500 Ore, -100 Money</click>
-				<reset>1 Player, 1 Ship, 250 Steel</reset>
+				<click>-1 Player, -1 Free Ship, -50 Fuel, -500 Ore, -100 Money</click>
+				<reset>1 Player, 1 Free Ship, 250 Steel</reset>
 			</converter>
 			<cooldown>30</cooldown>
 			<hideuntil>200 Money</hideuntil>
-			<hideafter>1 Furnace</hideafter>
+			<hideafter>1 Furnace, 1 Tier</hideafter>
 			<tooltip>Take a ship full of ore to a nearby refinery.</tooltip>
 		</button>
 		<button>
@@ -89,27 +95,29 @@
 			</converter>
 			<cooldown>10</cooldown>
 			<hideuntil>1 Furnace</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<tooltip>Use your steel furnace (and some fuel) to convert ore into steel</tooltip>
 		</button>
 		<button>
 			<title>Buy a Fuel Trap</title>
 			<converter>
-				<click>-1 Ship, -500 Money</click>
-				<reset>1 Fuel Trap, 1 Ship</reset>
+				<click>-1 Free Ship, -500 Money</click>
+				<reset>1 Fuel Trap, 1 Free Ship</reset>
 			</converter>
 			<cooldown>15</cooldown>
 			<hideuntil>100 Money</hideuntil>
-			<hideafter>1 Fuel Trap</hideafter>
+			<hideafter>1 Fuel Trap, 1 Tier</hideafter>
 			<tooltip>Fly out to buy a Fuel Trap, which will automatically collect fuel for you!</tooltip>
 		</button>
 		<button autoclick="true">
 			<title>Activate Fuel Trap</title>
 			<converter>
 				<click>-1 Fuel Trap</click>
-				<reset>1 Fuel Trap, 10 Fuel</reset>
+				<reset message="Your fuel trap is gathering fuel for you automatically...">1 Fuel Trap, 10 Fuel</reset>
 			</converter>
 			<cooldown>0.5</cooldown>
-			<hideuntil>2 Fuel Trap</hideuntil>
+			<hideuntil>1 Unobtanium</hideuntil>
+			<hideafter>1 Tier</hideafter>
 		</button>
 		<button>
 			<title>Buy Steel Furnace</title>
@@ -118,7 +126,7 @@
 				<reset>1 Furnace</reset>
 			</converter>
 			<hideuntil>1 Steel</hideuntil>
-			<hideafter>1 Furnace</hideafter>
+			<hideafter>1 Furnace, 1 Tier</hideafter>
 			<tooltip>Buy a steel furnace from a catalog and wait eagerly for it to be delivered.</tooltip>
 			<cooldown>30</cooldown>
 		</button>
@@ -129,6 +137,7 @@
 				<reset>1 Player, 1 Room</reset>
 			</converter>
 			<hideuntil>100 Steel</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<tooltip>Use some steel to add onto the station.</tooltip>
 			<cooldown>60</cooldown>
 		</button>
@@ -139,7 +148,7 @@
 				<reset>1 Crew</reset>
 			</converter>
 			<hideuntil>2 Rooms</hideuntil>
-			<hideafter>1 Clonelab</hideafter>
+			<hideafter>1 Clonelab, 1 Tier</hideafter>
 			<cooldown>15</cooldown>
 			<tooltip>Convince (with money) a crazy person to join you.</tooltip>
 		</button>
@@ -150,17 +159,18 @@
 				<reset>1 Crew</reset>
 			</converter>
 			<hideuntil>1 Clonelab</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<cooldown>30</cooldown>
 			<tooltip>Start the process to grow another crewmember.</tooltip>
 		</button>
 		<button>
 			<title>Buy another Ship</title>
 			<converter>
-				<click>-1 Player, -1 Ship, -2000 Money</click>
-				<reset>1 Player, 2 Ships</reset>
+				<click>-1 Player, -1 Free Ship, -2000 Money</click>
+				<reset>1 Player, 2 Free Ships, 1 Ship</reset>
 			</converter>
 			<hideuntil>1 Crew</hideuntil>
-			<hideafter>1 Shipyard</hideafter>
+			<hideafter>1 Shipyard, 1 Tier</hideafter>
 			<cooldown>30</cooldown>
 			<tooltip>Fly out and tow home a new (to you) ship!</tooltip>
 		</button>
@@ -173,16 +183,18 @@
 				<reset>1 Player, 1 Shipyard</reset>
 			</converter>
 			<cooldown>60</cooldown>
+			<hideafter>1 Tier, 1 Shipyard</hideafter>
 			<tooltip>Use a lot of steel and some expensive parts to make a shipyard, so you can build your own ships!</tooltip>
 		</button>
 		<button>
 			<title>Build a Ship</title>
 			<converter>
 				<click>-1 Player, -1000 Steel</click>
-				<reset>1 Player, 1 Ship</reset>
+				<reset>1 Player, 1 Ship, 1 Free Ship</reset>
 			</converter>
 			<cooldown>45</cooldown>
 			<hideuntil>1 Shipyard</hideuntil>
+			<hideafter>1 Tier</hideafter>
 			<tooltip>Use steel to make a new ship!</tooltip>
 		</button>
 		<button>
@@ -193,7 +205,7 @@
 			</converter>
 			<cooldown>60</cooldown>
 			<hideuntil>1 Shipyard, 5 Crew, 100 Organics</hideuntil>
-			<hideafter>1 Clonelab</hideafter>
+			<hideafter>1 Clonelab, 1 Tier</hideafter>
 			<tooltip>Forget hiring help, grow it! All you need is a little investment up front...</tooltip>
 		</button>
 		<button>
@@ -204,9 +216,116 @@
 			</converter>
 			<cooldown>60</cooldown>
 			<hideuntil>200 Organics</hideuntil>
-			<hideafter>1 Greenhouse</hideafter>
+			<hideafter>1 Greenhouse, 1 Tier</hideafter>
 			<tooltip>Start growing and harvesting your own organics</tooltip>
 		</button>
+		<button>
+			<title>Sell a Ship</title>
+			<converter>
+				<click>-1 Player, -1 Ship, -2 Free Ship</click>
+				<reset>1 Player, 1 Free Ship, random(3000,4000) Money</reset>
+			</converter>
+			<hideuntil>3 Free Ships</hideuntil>
+			<hideafter>1 Tier</hideafter>
+			<cooldown>30</cooldown>
+			<tooltip>Start selling those extra ships for cold hard cash!</tooltip>
+		</button>
+		<button autoclick="true">
+			<title>Move to Tier 2</title>
+			<converter>
+				<click messsage="Your business has moved to the next level...">-90 Crew, 1 Tier</click>
+			</converter>
+			<hideuntil>1 Unobtanium</hideuntil>
+			<hideafter>1 Tier</hideafter>
+		</button>
+		
+		<!-- Tier 2 -->
+		<button>
+			<title>Harvest Fuel</title>
+			<converter>
+				<click>-1 Player</click>
+				<reset>100 Fuel, 1 Player</reset>
+			</converter>
+			<cooldown>1</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+			<tooltip>Harvest fuel from the space around your station.</tooltip>
+		</button>
+		<button>
+			<title>Mine an asteroid field</title>
+			<converter>
+				<click>-1 Player, 300 Fuel, 1 Free Ship</click>
+				<reset>1 Player, random(1000,1500) Ore, 1 Free Ship</reset>
+			</converter>
+			<cooldown>5</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+			<tooltip>Take a mining vessel out and strip an entire block of asteroid field.</tooltip>
+		</button>
+		<button>
+			<title>Convert Ore to Steel</title>
+			<converter>
+				<click>-1 Player, -2000 Ore</click>
+				<reset>1 Player, 1000 Steel</reset>
+			</converter>
+			<cooldown>10</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+			<tooltip>Your refinery is running 24/7 now, you might as well get some steel out of it!</tooltip>
+		</button>
+		<button>
+			<title>Add a wing of living quarters</title>
+			<converter>
+				<click>-1 Player, -10000 Ore</click>
+				<reset>1 Player, 10 Room</reset>
+			</converter>
+			<cooldown>30</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+			<tooltip>Add a whole section to the station, enough for 10 squads of crew.</tooltip>
+		</button>
+		<button>
+			<title>Grow a batch of workers</title>
+			<converter>
+				<click>-1 Player, -10000 Organics, -1 Room</click>
+				<reset>1 Player, 1 Crew</reset>
+			</converter>
+			<cooldown>30</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+			<tooltip>Grow a whole flock of clones to help man the station.</tooltip>
+		</button>
+		<button>
+			<title>Build Ships</title>
+			<converter>
+				<click>-1 Player, -10000 Steel</click>
+				<reset>1 Player, 10 Ships, 10 Free Ships</reset>
+			</converter>
+			<cooldown>30</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+			<tooltip>Build a whole flotilla of ships.</tooltip>
+		</button>
+		<button>
+			<title>Sell Ships</title>
+			<converter>
+				<click>-1 Player, -10 Ships, -11 Free Ships</click>
+				<reset>1 Player, 1 Free Ship, random(32000,35000) Money </reset>
+			</converter>
+			<cooldown>30</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+		</button>
+		<button autoclick="true">
+			<title>Fuel Drain</title>
+			<converter>
+				<click>-10 Fuel</click>
+			</converter>
+			<cooldown>1</cooldown>
+			<hideuntil>1 Tier</hideuntil>
+			<hideafter>2 Tier</hideafter>
+		</button>
+		
 		<button>
 			<title>Cheater</title>
 			<converter>
@@ -222,7 +341,8 @@
 		<resource min="1">Organic,Organics</resource>
 		<resource value="10">Fuel</resource>
 		<resource min="1">Steel</resource>
-		<resource min="2" value="1">Ship,Ships</resource>
+		<resource min="3" value="1">Ship,Ships</resource>
+		<resource min="2" value="1">Free Ship, Free Ships</resource>
 		<resource min="100">Fuel Trap, Fuel Traps</resource>
 		<resource min="2">Crew</resource>
 		<resource min="100">Furnace</resource>
@@ -230,6 +350,8 @@
 		<resource min="100">Greenhouse</resource>
 		<resource min="100">Clonelab</resource>
 		<resource min="100" value="1">Player</resource>
+		<resource min="100">Unobtanium</resource>
+		<resource min="100">Tier</resource>
 	</resources>
 	
 	<settings>
@@ -244,8 +366,11 @@
     <background_color>50,50,50</background_color>
     <worker_sprite_path>worker.png</worker_sprite_path>
     <debugging>false</debugging>
-    <time_multiplier>1.0</time_multiplier>
+    <time_multiplier>5.0</time_multiplier>
     <window_width>1000.0</window_width>
     <window_height>800.0</window_height>
+	<mq_width>200.0</mq_width>
+	<mq_text_size>14.0</mq_text_size>
+	<mq_lifetime>10</mq_lifetime>
   </settings>
 </game>

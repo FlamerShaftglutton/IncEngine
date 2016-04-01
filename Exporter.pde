@@ -19,8 +19,9 @@ void export_resources_to_xml(XML root)
     XML r = rs.addChild("resource");
     
     r.setContent(resources[i].singular_name + "," + resources[i].plural_name);
-    r.setInt("value",resources[i].value);
+    r.setInt("value",resources[i].get_value());
     r.setInt("min",resources[i].min_to_display);
+    r.setInt("alltime",resources[i].get_alltime_amount());
   }
 }
 
@@ -58,20 +59,44 @@ void export_buttons_to_xml(XML root)
     }
     
     if (buttons[i].hideuntil != null)
-      b.addChild("hideuntil").setContent(buttons[i].hideuntil.list.to_string());
+    {
+      XML cc = b.addChild("hideuntil");
+      cc.setContent(buttons[i].hideuntil.list.to_string());
+      cc.setString("all",buttons[i].hideuntil.all ? "true" : "false");
+    }
     
     if (buttons[i].hideafter != null)
-      b.addChild("hideafter").setContent(buttons[i].hideafter.list.to_string());
+    {
+      XML cc = b.addChild("hideafter");
+      cc.setContent(buttons[i].hideafter.list.to_string());
+      cc.setString("all",buttons[i].hideafter.all ? "true" : "false");
+    }
     
     if (buttons[i].converter != null)
     {
       XML c = b.addChild("converter");
       
-      if (buttons[i].converter.click != null)
-        c.addChild("click").setContent(buttons[i].converter.click.to_string());
+      if (buttons[i].converter.click != null || !buttons[i].converter.click_message.equals(""))
+      {
+        XML cc = c.addChild("click");
+        
+        if (buttons[i].converter.click != null)
+          cc.setContent(buttons[i].converter.click.to_string());
+          
+        if (!buttons[i].converter.click_message.equals(""))
+          cc.setString("message",buttons[i].converter.click_message);
+      }
       
-      if (buttons[i].converter.reset != null)
-        c.addChild("reset").setContent(buttons[i].converter.reset.to_string());
+      if (buttons[i].converter.reset != null || !buttons[i].converter.reset_message.equals(""))
+      {
+        XML cc = c.addChild("reset");
+        
+        if (buttons[i].converter.reset != null)
+          cc.setContent(buttons[i].converter.reset.to_string());
+          
+        if (!buttons[i].converter.reset_message.equals(""))
+          cc.setString("message",buttons[i].converter.reset_message);
+      }
     }
     
     if (buttons[i].myworkers != null && buttons[i].myworkers.size() > 0)

@@ -9,35 +9,58 @@ int type_index_from_name(String name)
       return i;
   }
   
+  if (settings.debugging)
+    println("Couldn't find resource type '" + name + "'.");
+  
   return -1;
 }
 
 class Resource
 {
   boolean display;
-  int value;
+  int val;
   String singular_name;
   String plural_name;
   int min_to_display;
+  int alltime_amount;
   
-  Resource(int _min_to_display, int _value, String _singular_name, String _plural_name)
+  Resource(int _min_to_display, int _value, String _singular_name, String _plural_name, int _alltime_amount)
   {
     display = _value >= _min_to_display;
-    value = _value;
+    val = _value;
     singular_name = _singular_name;
     plural_name = _plural_name;
     min_to_display = _min_to_display;
+    alltime_amount = _alltime_amount;
   }
   
   String get_name()
   {
-    return value > 1 ? plural_name : singular_name;
+    return val > 1 ? plural_name : singular_name;
   }
   
   boolean visible()
   {
-    display |= value >= min_to_display;
+    display |= val >= min_to_display;
     return display;
+  }
+  
+  int get_value()
+  {
+    return val;
+  }
+  
+  void add_value(int amount)
+  {
+    if (amount > 0)
+      alltime_amount += amount;
+    
+    val += amount;
+  }
+  
+  int get_alltime_amount()
+  {
+    return alltime_amount;
   }
 }
 
