@@ -233,7 +233,7 @@
 	</resources>
 	
 	<settings>
-    <default_text_size>32.0</default_text_size>
+    <default_text_size>18.0</default_text_size>
     <default_text_color>255, 255, 255, 255</default_text_color>
     <default_button_text_color>0, 0, 0, 255</default_button_text_color>
     <default_button_color>255, 255, 255, 255</default_button_color>

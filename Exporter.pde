@@ -119,6 +119,9 @@ void export_settings_to_xml(XML root)
   s.addChild("time_multiplier").setFloatContent(settings.time_multiplier);
   s.addChild("window_width").setFloatContent(settings.window_width);
   s.addChild("window_height").setFloatContent(settings.window_height);
+  s.addChild("mq_width").setFloatContent(settings.mq_width);
+  s.addChild("mq_text_size").setFloatContent(settings.mq_text_size);
+  s.addChild("mq_lifetime").setFloatContent(settings.mq_lifetime);
 }
 
 String color_to_string(color _c)

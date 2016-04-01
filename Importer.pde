@@ -29,6 +29,9 @@ void import_settings_from_xml(XML xml)
   float time_multiplier = 1.0f;
   float window_width = 1000.0f;
   float window_height = 800.0f;
+  float mq_width = 100.0f;
+  float mq_text_size = 14.0f;
+  float mq_lifetime = 10.0f;
   
   if (xml != null)
   {
@@ -66,6 +69,12 @@ void import_settings_from_xml(XML xml)
         window_width = kid.getFloatContent();
       else if (n.equals("window_height"))
         window_height = kid.getFloatContent();
+      else if (n.equals("mq_width"))
+        mq_width = kid.getFloatContent();
+      else if (n.equals("mq_text_size"))
+        mq_text_size = kid.getFloatContent();
+      else if (n.equals("mq_lifetime"))
+        mq_lifetime = kid.getFloatContent();
     }
   }
   
@@ -84,6 +93,9 @@ void import_settings_from_xml(XML xml)
   settings.time_multiplier = time_multiplier;
   settings.window_width = window_width;
   settings.window_height = window_height;
+  settings.mq_width = mq_width;
+  settings.mq_text_size = mq_text_size;
+  settings.mq_lifetime = mq_lifetime;
 }
 
 void import_resources_from_xml(XML xml)
