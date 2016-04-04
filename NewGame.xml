@@ -109,14 +109,13 @@
 			<hideafter>1 Fuel Trap, 1 Tier</hideafter>
 			<tooltip>Fly out to buy a Fuel Trap, which will automatically collect fuel for you!</tooltip>
 		</button>
-		<button autoclick="true">
+		<button autoclick="invisible">
 			<title>Activate Fuel Trap</title>
 			<converter>
 				<click>-1 Fuel Trap</click>
 				<reset message="Your fuel trap is gathering fuel for you automatically...">1 Fuel Trap, 10 Fuel</reset>
 			</converter>
-			<cooldown>0.5</cooldown>
-			<hideuntil>1 Unobtanium</hideuntil>
+			<cooldown>1</cooldown>
 			<hideafter>1 Tier</hideafter>
 		</button>
 		<button>
@@ -225,17 +224,16 @@
 				<click>-1 Player, -1 Ship, -2 Free Ship</click>
 				<reset>1 Player, 1 Free Ship, random(3000,4000) Money</reset>
 			</converter>
-			<hideuntil>3 Free Ships</hideuntil>
+			<hideuntil>1 Shipyard</hideuntil>
 			<hideafter>1 Tier</hideafter>
 			<cooldown>30</cooldown>
 			<tooltip>Start selling those extra ships for cold hard cash!</tooltip>
 		</button>
-		<button autoclick="true">
+		<button autoclick="invisible">
 			<title>Move to Tier 2</title>
 			<converter>
-				<click messsage="Your business has moved to the next level...">-90 Crew, 1 Tier</click>
+				<click message="Your business has moved to the next level...">-100 Crew, 1 Tier, 10 Crew</click>
 			</converter>
-			<hideuntil>1 Unobtanium</hideuntil>
 			<hideafter>1 Tier</hideafter>
 		</button>
 		
@@ -316,7 +314,7 @@
 			<hideuntil>1 Tier</hideuntil>
 			<hideafter>2 Tier</hideafter>
 		</button>
-		<button autoclick="true">
+		<button autoclick="invisible">
 			<title>Fuel Drain</title>
 			<converter>
 				<click>-10 Fuel</click>
@@ -350,7 +348,6 @@
 		<resource min="100">Greenhouse</resource>
 		<resource min="100">Clonelab</resource>
 		<resource min="100" value="1">Player</resource>
-		<resource min="100">Unobtanium</resource>
 		<resource min="100">Tier</resource>
 	</resources>
 	

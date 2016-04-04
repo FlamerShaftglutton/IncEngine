@@ -53,7 +53,8 @@ void draw()
 {
   int ctime = millis();
   
-  background(settings.background_color);
+  fill(settings.background_color);
+  rect(0,0,width,height);
   
   float delta = settings.time_multiplier * float(ctime - ptime) / 1000.0f;
   
@@ -62,7 +63,7 @@ void draw()
   {
     b.update(delta);
     
-    if (b.visible && b.hideuntil == null)
+    if (b.visible && b.hideuntil == null && !b.always_invisible)
     {
       b.y = y;
       y += settings.default_text_size * 2.0f;

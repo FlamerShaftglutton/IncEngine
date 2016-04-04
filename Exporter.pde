@@ -43,7 +43,10 @@ void export_buttons_to_xml(XML root)
     b.setFloat("text_height", buttons[i].text_height / settings.default_text_size);
     b.setString("visible", buttons[i].visible ? "true" : "false");
     b.setString("enabled", buttons[i].enabled ? "true" : "false");
-    if (buttons[i].autoclick)
+    
+    if (buttons[i].always_invisible)
+      b.setString("autoclick","invisible");
+    else if (buttons[i].autoclick)
       b.setString("autoclick","true");
     
     

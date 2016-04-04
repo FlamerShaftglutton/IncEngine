@@ -154,8 +154,9 @@ void import_buttons_from_xml(XML xml)
     float   h = xbuttons[i].getFloat("height",-1.0f);
     float   text_height = xbuttons[i].getFloat("text_height",1.0f);
     boolean visible = xbuttons[i].getString("visible","true").equals("true");
+    boolean always_invisible = xbuttons[i].getString("autoclick","false").equals("invisible");
     boolean enabled = xbuttons[i].getString("enabled","true").equals("true");
-    boolean autoclick = xbuttons[i].getString("autoclick","false").equals("true");
+    boolean autoclick = always_invisible || xbuttons[i].getString("autoclick","false").equals("true");
     color   button_color = string_to_color(xbuttons[i].getString("button_color",color_to_string(settings.default_button_color)));
     color   outline_color = string_to_color(xbuttons[i].getString("outline_color",color_to_string(settings.default_button_outline_color)));
     color   text_color = string_to_color(xbuttons[i].getString("text_color",color_to_string(settings.default_button_text_color)));
@@ -268,7 +269,7 @@ void import_buttons_from_xml(XML xml)
     }
     
     //now construct the button
-    buttons[i] = new Button(title, x, y, w, h, text_height * settings.default_text_size, visible, enabled, autoclick, button_color, outline_color, text_color, disabled_text_color, cooldown_overlay_color, cooldown_worker_overlay_color);
+    buttons[i] = new Button(title, x, y, w, h, text_height * settings.default_text_size, visible, always_invisible, enabled, autoclick, button_color, outline_color, text_color, disabled_text_color, cooldown_overlay_color, cooldown_worker_overlay_color);
     buttons[i].tooltip = tooltip;
     
     if (cooldown)

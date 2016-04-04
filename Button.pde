@@ -1,6 +1,6 @@
 class Button
 {
-  protected String text;
+  String words;
   float x;
   float y;
   float w;
@@ -14,6 +14,7 @@ class Button
   color cooldown_overlay_color;
   color cooldown_worker_overlay_color;
   
+  boolean always_invisible;
   boolean visible;
   boolean enabled;
   
@@ -29,9 +30,9 @@ class Button
   
   IntList myworkers;
   
-  Button(String _text, float _x, float _y, float _w, float _h, float _text_height, boolean _visible, boolean _enabled, boolean _autoclick, color _button_color, color _outline_color, color _text_color, color _disabled_text_color, color _cooldown_overlay_color, color _cooldown_worker_overlay_color)
+  Button(String _words, float _x, float _y, float _w, float _h, float _text_height, boolean _visible, boolean _always_invisible, boolean _enabled, boolean _autoclick, color _button_color, color _outline_color, color _text_color, color _disabled_text_color, color _cooldown_overlay_color, color _cooldown_worker_overlay_color)
   {
-    text =_text;
+    words =_words;
     x = _x;
     y = _y;
     
@@ -47,7 +48,7 @@ class Button
     text_height = _text_height;
     textSize(text_height);
     h = floor(text_height * 1.5f);
-    w = floor(textWidth(text)) + h;
+    w = floor(textWidth(words)) + h;
     
     if (_w > w)
       w = _w;
@@ -57,6 +58,7 @@ class Button
 
     enabled = _enabled;
     visible = _visible;
+    always_invisible = _always_invisible;
     autoclick = _autoclick;
     
     cooldown = null;
@@ -68,63 +70,63 @@ class Button
   
   Button(String _text, float _x, float _y)
   {
-    this(_text, _x, _y, -1.0f, -1.0f, 32.0f, true, true, false, settings.default_button_color, settings.default_button_outline_color, settings.default_button_text_color, settings.default_disabled_text_color, settings.default_cooldown_overlay_color, settings.default_cooldown_worker_overlay_color);
+    this(_text, _x, _y, -1.0f, -1.0f, 32.0f, true, false, true, false, settings.default_button_color, settings.default_button_outline_color, settings.default_button_text_color, settings.default_disabled_text_color, settings.default_cooldown_overlay_color, settings.default_cooldown_worker_overlay_color);
   }
   
-  void set_string(String _text)
+  void set_string(String _words)
   {
-    text = _text;
+    words = _words;
     
     textSize(text_height);
-    w = textWidth(_text) + h;
+    w = textWidth(_words) + h;
   }
   
   String get_string()
   {
-    return text;
+    return words;
   }
   
   void display()
   {
-    if (visible && hideuntil == null)
+    if (!visible || hideuntil != null || always_invisible)
+      return;
+      
+    //draw the box
+    noTint();
+    stroke(outline_color);
+    fill(button_color);
+    rect(x,y,w,h);
+    
+    //draw the cooldown timer(s)
+    if (cooldown != null)
     {
-      //draw the box
-      noTint();
-      stroke(outline_color);
-      fill(button_color);
-      rect(x,y,w,h);
-      
-      //draw the cooldown timer
-      if (cooldown != null)
+      if (!enabled && cooldown.current_amount > 0.0f)
       {
-        if (!enabled && cooldown.current_amount > 0.0f)
-        {
-          noStroke();
-          fill(cooldown_overlay_color);
-          rect(x,y,w * cooldown.current_amount / cooldown.max_amount, h);
-        }
-        
-        if (cooldown.current_worker_amount > 0.0f && myworkers.size() > 0)
-        {
-          noStroke();
-          fill(cooldown_worker_overlay_color);
-          rect(x,y + h * (1.0f - cooldown.current_worker_amount / cooldown.max_amount), w, h * cooldown.current_worker_amount / cooldown.max_amount);
-        }
+        noStroke();
+        fill(cooldown_overlay_color);
+        rect(x,y,w * cooldown.current_amount / cooldown.max_amount, h);
       }
       
-      //draw the word(s)
-      fill(enabled ? text_color : disabled_text_color);
+      if (cooldown.current_worker_amount > 0.0f && myworkers.size() > 0)
+      {
+        noStroke();
+        fill(cooldown_worker_overlay_color);
+        rect(x,y + h * (1.0f - cooldown.current_worker_amount / cooldown.max_amount), w, h * cooldown.current_worker_amount / cooldown.max_amount);
+      }
+    }
+    
+    //draw the words
+    fill(enabled ? text_color : disabled_text_color);
+    textSize(text_height);
+    text(words,x + (w - textWidth(words)) / 2.0f, y + text_height);
+    
+    //draw the worker count if necessary
+    if (myworkers.size() >= 5)
+    {
+      fill(settings.default_text_color);
       textSize(text_height);
-      text(text,x + (w - textWidth(text)) / 2.0f, y + text_height);
-      
-      //draw the worker count if necessary
-      if (myworkers.size() >= 5)
-      {
-        fill(settings.default_text_color);
-        textSize(text_height);
-        float xx = x + w + workers.get(myworkers.get(0)).w * 2.25f;
-        text("x" + myworkers.size(), xx, y + text_height);
-      }
+      float xx = x + w + workers.get(myworkers.get(0)).w * 2.25f;
+      text("x" + myworkers.size(), xx, y + text_height);
     }
   }
   
@@ -269,9 +271,9 @@ class Button
   
   void update(float delta)
   {
-    if (autoclick)
-      on_click();
+    enabled = true;
     
+    //check if we can drop the hideuntil
     if (hideuntil != null)
     {
       //check if the hideuntils have been met
@@ -282,8 +284,10 @@ class Button
       }
       
       visible = met;
+      enabled = met;
     }
     
+    //check if we can drop the hideafter
     if (hideafter != null)
     {
       //check if the hideuntils have been met
@@ -293,6 +297,8 @@ class Button
         visible = false;
         hideuntil = null;
         enabled = false;
+        autoclick = false;
+        converter = null;
         
         //also, kick out everyone working on this button!
         for (int i = 0; i < myworkers.size(); i++)
@@ -304,6 +310,7 @@ class Button
       }
     }
     
+    //do cooldown stuff
     if (cooldown != null)
     {
       if (myworkers.size() > 0)
@@ -336,7 +343,7 @@ class Button
         }
       }
       
-      if (!enabled && cooldown.current_amount > 0.0f)
+      if (cooldown.current_amount > 0.0f)
       {
         cooldown.current_amount -= delta;
         
@@ -346,21 +353,27 @@ class Button
           enabled = true;
           on_reset();
         }
-      }
-      else if (converter != null)
-      {
-        enabled = true;
-        for (int i = 0; i < converter.click.types.length; i++)
+        else
         {
-          if (resources[converter.click.types[i]].get_value() + converter.click.values[i].evaluate() < 0)
-          {
-            enabled = false;
-            break;
-          }
+          enabled = false;
         }
       }
     }
     
+    //determine if this should be enabled or not
+    if (converter != null && enabled)
+    {
+      for (int i = 0; i < converter.click.types.length; i++)
+      {
+        if (resources[converter.click.types[i]].get_value() + converter.click.values[i].evaluate() < 0)
+        {
+          enabled = false;
+          break;
+        }
+      }
+    }
+    
+    //move this button's workers around so that they are drawn in the right places
     if (myworkers.size() >= 5)
     {
       float yy = y + (h - workers.get(myworkers.get(0)).h) / 2.0f;
@@ -379,12 +392,16 @@ class Button
         workers.get(myworkers.get(i)).x = x + w + workers.get(myworkers.get(i)).w * 1.5f * (i + 0.5f);
       }
     }
+    
+    //do autoclicking if necessary
+    if (autoclick && enabled)
+      on_click();
   }
   
   boolean clicked()
   {
     boolean was_clicked = visible && enabled && mouseX >= x && mouseX <= x + w && mouseY > y && mouseY < y + h;
-    
+
     if (was_clicked)
     {
       on_click();

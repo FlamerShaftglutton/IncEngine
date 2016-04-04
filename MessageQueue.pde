@@ -8,7 +8,7 @@ class MessageQueue
   {
     mq = new Message[10];
     mq_size = 0;
-    h = height;
+    h = height * 0.75f;
   }
   
   void add_message(String _message)
@@ -47,8 +47,10 @@ class MessageQueue
         mq[i - first_live] = mq[i];
     }
     
-    if (first_live > 0)
+    if (first_live >= 0)
       mq_size -= first_live;
+    else
+      mq_size = 0;
     
     //now draw them all
     float yy = settings.mq_text_size * 2;
