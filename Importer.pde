@@ -179,10 +179,12 @@ void import_buttons_from_xml(XML xml)
     boolean hideuntil = false;
     String  hideuntil_innards = "";
     boolean hideuntil_all = false;
+    boolean hideuntil_alltime = true;
     
     boolean hideafter = false;
     String  hideafter_innards = "";
     boolean hideafter_all = false;
+    boolean hideafter_alltime = true;
     
     IntList worker_list = new IntList();
     
@@ -276,10 +278,10 @@ void import_buttons_from_xml(XML xml)
       buttons[i].cooldown = new Cooldown(cooldown_current_amount,cooldown_max_amount,cooldown_display,cooldown_worker_amount);
     
     if (hideuntil)
-      buttons[i].hideuntil = new Prerequisite(hideuntil_innards,hideuntil_all);
-      
+      buttons[i].hideuntil = new Prerequisite(hideuntil_innards, hideuntil_all, hideuntil_alltime);
+    
     if (hideafter)
-      buttons[i].hideafter = new Prerequisite(hideafter_innards,hideafter_all);
+      buttons[i].hideafter = new Prerequisite(hideafter_innards, hideafter_all, hideafter_alltime);
     
     if (converter)
       buttons[i].converter = new Converter(click_innards, reset_innards, click_message, reset_message);

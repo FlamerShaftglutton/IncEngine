@@ -171,23 +171,78 @@ class ResourceValue
 
 class RandomResourceValue extends ResourceValue
 {
-  int min_val;
-  int max_val;
+  ResourceValue min_val;
+  ResourceValue max_val;
   
   RandomResourceValue(int _min, int _max)
   {
     super(0);
-    min_val = _min;
-    max_val = _max;
+    min_val = new ResourceValue(_min);
+    max_val = new ResourceValue(_max);
   }
   
   int evaluate()
   {
-    return (int)random(min_val, max_val);
+    return (int)random(min_val.evaluate(), max_val.evaluate());
   }
   
   String to_string()
   {
-    return "random("+str(min_val)+","+str(max_val)+")";
+    return "random(" + min_val.to_string() + "," + max_val.to_string() + ")";
+  }
+}
+
+class ResourceExpression extends ResourceValue
+{
+  char op;
+  ResourceValue left,
+                right;
+  
+  ResourceExpression(String _input)
+  {
+    super(0);
+    
+    //find an operator
+    
+  }
+  
+  String to_string()
+  {
+    return left.to_string() + " " + op + " " + right.to_string();
+  }
+  
+  int evaluate()
+  {
+    switch (op)
+    {
+      case '*': return left.evaluate() * right.evaluate();
+      case '+': return left.evaluate() + right.evaluate();
+      case '-': return left.evaluate() - right.evaluate();
+      case '/': return left.evaluate() / right.evaluate();
+      case '%': return left.evaluate() % right.evaluate();
+    }
+    
+    println("Attempted to use unknown operator '" + op + "'. Returning -1;");
+    return -1;
+  }
+}
+
+class ResourceVariableValue extends ResourceValue
+{
+  int varindex;
+  ResourceVariableValue(String _varname)
+  {
+    super(0);
+    varindex = type_index_from_name(_varname);
+  }
+  
+  String to_string()
+  {
+    return resources[varindex].plural_name;
+  }
+  
+  int evaluate()
+  {
+    return resources[varindex].get_value();
   }
 }

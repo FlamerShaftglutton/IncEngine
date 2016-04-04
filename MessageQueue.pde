@@ -75,6 +75,7 @@ class Message
   {
     lifetime = max_lifetime = _lifetime;
     original_text = _mtext;
+    textSize(settings.mq_text_size);
     
     StringList lines = new StringList();
     
@@ -108,6 +109,9 @@ class Message
     
     text_lines = lines.array();
     h = lines.size() * settings.mq_text_size;
+    
+    if (text_lines.length == 1)
+      println(_effective_width);
   }
   
   void display(float x, float y)

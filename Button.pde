@@ -479,17 +479,19 @@ class Prerequisite
 {
   ResourceSet list;
   boolean all;
+  boolean alltime;
   
-  Prerequisite(ResourceSet _list, boolean _all)
+  Prerequisite(ResourceSet _list, boolean _all, boolean _alltime)
   {
     list = _list;
     
     all = _all;
+    alltime = _alltime;
   }
   
-  Prerequisite(String _input, boolean _all)
+  Prerequisite(String _input, boolean _all, boolean _alltime)
   {
-    this(new ResourceSet(_input), _all);
+    this(new ResourceSet(_input), _all, _alltime);
   }
   
   boolean met()

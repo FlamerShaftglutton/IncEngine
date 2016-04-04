@@ -54,7 +54,7 @@ void draw()
   int ctime = millis();
   
   fill(settings.background_color);
-  rect(0,0,width,height);
+  rect(0,0,settings.window_width,settings.window_height);
   
   float delta = settings.time_multiplier * float(ctime - ptime) / 1000.0f;
   

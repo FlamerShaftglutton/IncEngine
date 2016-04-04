@@ -66,6 +66,7 @@ void export_buttons_to_xml(XML root)
       XML cc = b.addChild("hideuntil");
       cc.setContent(buttons[i].hideuntil.list.to_string());
       cc.setString("all",buttons[i].hideuntil.all ? "true" : "false");
+      cc.setString("alltime",buttons[i].hideuntil.alltime ? "true" : "false");
     }
     
     if (buttons[i].hideafter != null)
@@ -73,6 +74,7 @@ void export_buttons_to_xml(XML root)
       XML cc = b.addChild("hideafter");
       cc.setContent(buttons[i].hideafter.list.to_string());
       cc.setString("all",buttons[i].hideafter.all ? "true" : "false");
+      cc.setString("alltime",buttons[i].hideafter.alltime ? "true" : "false");
     }
     
     if (buttons[i].converter != null)
