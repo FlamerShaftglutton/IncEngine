@@ -91,6 +91,7 @@ class ResourceSet
   {
     //the random(x,y) calls throw off our splitting by comma, so we need to address that first
     _input = _input.replaceAll("\\(([^,]+),([^,]+)\\)", "($1;$2)");
+    _input = _input.replaceAll("\\(([^,]+),([^,]+),([^,]+)\\)", "($1;$2;$3)");
     String[] chunks = trim(split(_input, ','));
     
     types = new int[chunks.length];
@@ -117,7 +118,7 @@ class ResourceSet
         
         //if this is an operand...
         int index = ops.indexOf(t);
-        if (index < 0 && !t.equals("random") && !t.equals(";"))
+        if (index < 0 && !t.equals("random") && !t.equals("clamp") && !t.equals(";"))
         {
           //were we expecting an operand?
           if (!expecting_operator)
@@ -166,6 +167,13 @@ class ResourceSet
                   ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
                   operand_stack.add(new RandomResourceValue(l,r));
                 }
+                else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
+                {
+                  ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
+                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
+                  ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
+                  operand_stack.add(new ClampResourceValue(v,l,h));
+                }
                 else
                 {
                   println("unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'. Exiting.");
@@ -190,7 +198,7 @@ class ResourceSet
         else
         {
           //check for random, unary minus, and left parens
-          if (t.equals("random") || t.equals("~") || t.equals("(") || operator_stack.size() == 0)
+          if (t.equals("random") || t.equals("clamp") || t.equals("~") || t.equals("(") || operator_stack.size() == 0)
           {
             operator_stack.append(t);
             expecting_operator = false;
@@ -200,6 +208,7 @@ class ResourceSet
             while (operator_stack.size() > 0)
             {
               int pindex = ops.indexOf(operator_stack.get(operator_stack.size() - 1));
+              
               if (ops.charAt(pindex) == '(')
                 break;
               
@@ -211,13 +220,20 @@ class ResourceSet
                   ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
                   operand_stack.add(new RandomResourceValue(l,r));
                 }
+                else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
+                {
+                  ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
+                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
+                  ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
+                  operand_stack.add(new ClampResourceValue(v,l,h));
+                }
                 else
                 {
                   println("unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'. Exiting.");
                   return;
                 }
               }
-              else if (precedence[pindex] >= precedence[index])
+              else// if (precedence[pindex] >= precedence[index])
               {
                 //resolve the previous one first
                 char pc = ops.charAt(pindex);
@@ -256,6 +272,13 @@ class ResourceSet
                   ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
                   operand_stack.add(new RandomResourceValue(l,r));
                 }
+                else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
+                {
+                  ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
+                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
+                  ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
+                  operand_stack.add(new ClampResourceValue(v,l,h));
+                }
                 else
                 {
                   println("unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'. Exiting.");
@@ -290,6 +313,9 @@ class ResourceSet
       
       values[chunk] = operand_stack.get(0);
       types[chunk] = type_index_from_name(resource_name);
+      
+      if (types[chunk] < 0)
+        println("Got '" + resource_name + "' from '" + chunks[chunk] + "'.");
     }
   }
   
@@ -299,9 +325,6 @@ class ResourceSet
     //String retval = "";
     for (int i = 0; i < types.length; i++)
     {
-      if (types[i] < 0)
-        println(values[i].to_string() + types[i]);
-      
       derps[i] = values[i].to_string() + " " + resources[types[i]].plural_name;
       //retval += " " + values[i].to_string() + " " + resources[types[i]].plural_name + ",";
     }
@@ -357,6 +380,39 @@ class RandomResourceValue extends ResourceValue
   String to_string()
   {
     return "random(" + min_val.to_string() + "," + max_val.to_string() + ")";
+  }
+}
+
+class ClampResourceValue extends ResourceValue
+{
+  ResourceValue value;
+  ResourceValue lowest_val;
+  ResourceValue highest_val;
+  
+  ClampResourceValue(ResourceValue _value, int _lowest, int _highest)
+  {
+    super(0);
+    value=_value;
+    lowest_val = new ResourceValue(_lowest);
+    highest_val = new ResourceValue(_highest);
+  }
+  
+  ClampResourceValue(ResourceValue _value, ResourceValue _lowest, ResourceValue _highest)
+  {
+    super(0);
+    value = _value;
+    lowest_val = _lowest;
+    highest_val = _highest;
+  }
+  
+  int evaluate()
+  {
+    return constrain(value.evaluate(), lowest_val.evaluate(), highest_val.evaluate());
+  }
+  
+  String to_string()
+  {
+    return "clamp(" + value.to_string() + ", " + lowest_val.to_string() + ", " + highest_val.to_string() + ")";
   }
 }
 
