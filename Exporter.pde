@@ -33,9 +33,6 @@ void export_buttons_to_xml(XML root)
   {
     XML b = bs.addChild("button");
     
-    b.addChild("title").setContent(buttons[i].get_string());
-    b.addChild("tooltip").setContent(buttons[i].tooltip);
-    
     b.setFloat("x", buttons[i].x);
     b.setFloat("y", buttons[i].y);
     b.setFloat("width", buttons[i].w);
@@ -49,7 +46,15 @@ void export_buttons_to_xml(XML root)
     else if (buttons[i].autoclick)
       b.setString("autoclick","true");
     
-    
+        
+    b.addChild("title").setContent(buttons[i].get_string());
+    if (!buttons[i].tooltip.equals(""))
+    {
+      XML ttc = b.addChild("tooltip");
+      ttc.setContent(buttons[i].tooltip);
+      if (buttons[i].display_cost_in_tooltip != settings.display_cost_in_tooltip)
+        ttc.setString("display_cost","true");
+    }
     
     if (buttons[i].cooldown != null)
     {
@@ -152,6 +157,7 @@ void export_settings_to_xml(XML root)
   s.addChild("mq_width").setFloatContent(settings.mq_width);
   s.addChild("mq_text_size").setFloatContent(settings.mq_text_size);
   s.addChild("mq_lifetime").setFloatContent(settings.mq_lifetime);
+  s.addChild("display_cost_in_tooltip").setContent(settings.display_cost_in_tooltip ? "true" : "false");
 }
 
 String color_to_string(color _c)

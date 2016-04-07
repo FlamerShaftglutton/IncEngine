@@ -20,4 +20,6 @@ class Settings
   float mq_width;
   float mq_text_size;
   float mq_lifetime;
+  
+  boolean display_cost_in_tooltip;
 }

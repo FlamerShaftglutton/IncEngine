@@ -22,6 +22,7 @@ class Button
   
   String tooltip;
   float tooltip_time;
+  boolean display_cost_in_tooltip;
   
   Cooldown cooldown;
   Prerequisite hideuntil;
@@ -44,6 +45,7 @@ class Button
     cooldown_worker_overlay_color = _cooldown_worker_overlay_color;
     
     tooltip = "";
+    display_cost_in_tooltip = false;
     
     text_height = _text_height;
     textSize(text_height);
@@ -144,12 +146,26 @@ class Button
         
         float ttw = textWidth(tooltip);
         
+        
         stroke(0);
         fill(255);
         
-        rect(mouseX, mouseY, ttw + 0.75f * text_height, 0.75f * text_height);
+        float tth = 0.75f * text_height;
+        String cost_string = "";
+        
+        if (display_cost_in_tooltip && converter != null)
+        {
+          cost_string = converter.click.to_evaluated_string();
+          tth = 1.25f * text_height;
+          ttw = max(ttw, textWidth(cost_string));
+        }
+        
+        rect(mouseX, mouseY, ttw + 0.75f * text_height, tth);
         fill(0);
-        text(tooltip, mouseX + 0.375f * text_height, mouseY + 0.5 * text_height);
+        text(tooltip, mouseX + 0.375f * text_height, mouseY + 0.5f * text_height);
+        
+        if (cost_string.length() > 0)
+          text(cost_string, mouseX + 0.375f * text_height, mouseY + 1.0f * text_height);
       }
     }
     else

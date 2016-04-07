@@ -41,7 +41,7 @@ class Resource
   
   boolean visible()
   {
-    display |= val >= min_to_display;
+    display |= min_to_display >= 0 && val >= min_to_display;
     return display;
   }
   
@@ -209,7 +209,7 @@ class ResourceSet
             {
               int pindex = ops.indexOf(operator_stack.get(operator_stack.size() - 1));
               
-              if (ops.charAt(pindex) == '(')
+              if (pindex >= 0 && ops.charAt(pindex) == '(')
                 break;
               
               if (pindex < 0)
@@ -322,14 +322,29 @@ class ResourceSet
   String to_string()
   {
     String[] derps = new String[types.length];
-    //String retval = "";
+
     for (int i = 0; i < types.length; i++)
     {
-      derps[i] = values[i].to_string() + " " + resources[types[i]].plural_name;
-      //retval += " " + values[i].to_string() + " " + resources[types[i]].plural_name + ",";
+      derps[i] = "(" + values[i].to_string() + ") " + resources[types[i]].plural_name;
     }
     
     return join(derps, ", ");
+  }
+  
+  String to_evaluated_string()
+  {
+    StringList derps = new StringList();
+    
+    for (int i = 0; i < types.length; i++)
+    {
+      if (types[i] == player_type_index)
+        continue;
+      
+      int v = values[i].evaluate();
+      derps.append(nf(v) + " " + (v == 1 ? resources[types[i]].singular_name : resources[types[i]].plural_name));
+    }
+    
+    return join(derps.array(), ", ");
   }
 }
 

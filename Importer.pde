@@ -32,6 +32,7 @@ void import_settings_from_xml(XML xml)
   float mq_width = 100.0f;
   float mq_text_size = 14.0f;
   float mq_lifetime = 10.0f;
+  boolean display_cost_in_tooltip = false;
   
   if (xml != null)
   {
@@ -75,6 +76,8 @@ void import_settings_from_xml(XML xml)
         mq_text_size = kid.getFloatContent();
       else if (n.equals("mq_lifetime"))
         mq_lifetime = kid.getFloatContent();
+      else if (n.equals("display_cost_in_tooltip"))
+        display_cost_in_tooltip = kid.getContent().equals("true");
     }
   }
   
@@ -96,6 +99,7 @@ void import_settings_from_xml(XML xml)
   settings.mq_width = mq_width;
   settings.mq_text_size = mq_text_size;
   settings.mq_lifetime = mq_lifetime;
+  settings.display_cost_in_tooltip = display_cost_in_tooltip;
 }
 
 void import_resources_from_xml(XML xml)
@@ -147,6 +151,7 @@ void import_buttons_from_xml(XML xml)
   {
     String  title = "?";
     String  tooltip = "";
+    boolean display_cost_in_tooltip = settings.display_cost_in_tooltip;
     
     float   x = xbuttons[i].getFloat("x",settings.default_text_size + settings.mq_width);
     float   y = xbuttons[i].getFloat("y",float(i + 1) * settings.default_text_size * 1.5f);
@@ -239,6 +244,8 @@ void import_buttons_from_xml(XML xml)
       else if (n.equals("tooltip"))
       {
         tooltip = kid.getContent();
+        
+        display_cost_in_tooltip = kid.getString("display_cost",settings.display_cost_in_tooltip ? "true" : "false") == "true";
       }
       else if (n.equals("converter"))
       {
@@ -273,6 +280,7 @@ void import_buttons_from_xml(XML xml)
     //now construct the button
     buttons[i] = new Button(title, x, y, w, h, text_height * settings.default_text_size, visible, always_invisible, enabled, autoclick, button_color, outline_color, text_color, disabled_text_color, cooldown_overlay_color, cooldown_worker_overlay_color);
     buttons[i].tooltip = tooltip;
+    buttons[i].display_cost_in_tooltip = display_cost_in_tooltip;
     
     if (cooldown)
       buttons[i].cooldown = new Cooldown(cooldown_current_amount,cooldown_max_amount,cooldown_display,cooldown_worker_amount);
