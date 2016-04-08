@@ -26,7 +26,7 @@ class Resource
   
   Resource(int _min_to_display, int _value, String _singular_name, String _plural_name, int _alltime_amount)
   {
-    display = _value >= _min_to_display;
+    display = _min_to_display >= 0 && _value >= _min_to_display;
     val = _value;
     singular_name = _singular_name;
     plural_name = _plural_name;
@@ -89,23 +89,21 @@ class ResourceSet
   
   ResourceSet(String _input)
   {
-    //the random(x,y) calls throw off our splitting by comma, so we need to address that first
-    _input = _input.replaceAll("\\(([^,]+),([^,]+)\\)", "($1;$2)");
-    _input = _input.replaceAll("\\(([^,]+),([^,]+),([^,]+)\\)", "($1;$2;$3)");
-    String[] chunks = trim(split(_input, ','));
+    String[] chunks = trim(split_ignoring_enclosed(_input));
     
     types = new int[chunks.length];
     values = new ResourceValue[chunks.length];
     
     for (int chunk = 0; chunk < chunks.length; chunk++)
     {
-      String[] _tokens = tokenize_string(chunks[chunk],"()+-/*^%;", " \t\n\r");
+      String[] _tokens = tokenize_string(chunks[chunk],"()+-/*^%,", " \t\n\r");
       String resource_name = "";
       StringList operator_stack = new StringList();
       ArrayList<ResourceValue> operand_stack = new ArrayList<ResourceValue>();
       boolean expecting_operator = false;
-      String ops = "()^~*/+-%";
-      int[] precedence = {0,0,8,7,6,6,5,5,4};
+      String ops = "(),^~*/+-%";
+      int[] precedence = {0,0,0,8,7,6,6,5,5,4};
+      StringList functions = new StringList(new String[]{"random","clamp"});
       
       //parse as much as possible
       for (int i = 0; i < _tokens.length; i++)
@@ -118,7 +116,7 @@ class ResourceSet
         
         //if this is an operand...
         int index = ops.indexOf(t);
-        if (index < 0 && !t.equals("random") && !t.equals("clamp") && !t.equals(";"))
+        if (index < 0 && !functions.hasValue(t))
         {
           //were we expecting an operand?
           if (!expecting_operator)
@@ -157,39 +155,11 @@ class ResourceSet
             //now finish off the expression
             while (operator_stack.size() > 0)
             {
-              int pindex = ops.indexOf(operator_stack.get(operator_stack.size() - 1));
-              
-              if (pindex < 0)
+              if (process_previous_operator(operator_stack, operand_stack, ops) && settings.debugging)
               {
-                if (operator_stack.get(operator_stack.size() - 1).equals("random"))
-                {
-                  ResourceValue r = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                  operand_stack.add(new RandomResourceValue(l,r));
-                }
-                else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
-                {
-                  ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
-                  operand_stack.add(new ClampResourceValue(v,l,h));
-                }
-                else
-                {
-                  println("unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'. Exiting.");
-                  return;
-                }
+                println("Error parsing expression: failed on token '" + t + "' in expression \"" + chunks[chunk] + "\" in expression set \"" + _input + "\".");
+                break;
               }
-              else
-              {
-                //resolve the previous one first
-                char pc = ops.charAt(pindex);
-                ResourceValue r = pc == '~' ? null : operand_stack.remove(operand_stack.size() - 1);
-                ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                operand_stack.add(new ResourceExpression(l,r, pc));
-              }
-              
-              operator_stack.remove(operator_stack.size() - 1);
             }
           }
         }
@@ -197,52 +167,24 @@ class ResourceSet
         //if it's an operator...
         else
         {
-          //check for random, unary minus, and left parens
-          if (t.equals("random") || t.equals("clamp") || t.equals("~") || t.equals("(") || operator_stack.size() == 0)
+          //we almost always need an operand next
+          expecting_operator = false;
+          
+          //functions, unary minuses, and opening parenthesis are just thrown on the stack
+          if (functions.hasValue(t) || t.equals("~") || t.equals("(") || operator_stack.size() == 0)
           {
             operator_stack.append(t);
-            expecting_operator = false;
           }
-          else if (t.equals(")") || t.equals(";"))
+          //closing parenthesis and commas (function argument separators) will evaluate the stack until we hit an opening parenthesis
+          else if (t.equals(")") || t.equals(","))
           {
-            while (operator_stack.size() > 0)
+            while (operator_stack.size() > 0 && !operator_stack.get(operator_stack.size() - 1).equals("("))
             {
-              int pindex = ops.indexOf(operator_stack.get(operator_stack.size() - 1));
-              
-              if (pindex >= 0 && ops.charAt(pindex) == '(')
+              if (process_previous_operator(operator_stack, operand_stack, ops) && settings.debugging)
+              {
+                println("Error parsing expression: failed on token '" + t + "' in expression \"" + chunks[chunk] + "\" in expression set \"" + _input + "\".");
                 break;
-              
-              if (pindex < 0)
-              {
-                if (operator_stack.get(operator_stack.size() - 1).equals("random"))
-                {
-                  ResourceValue r = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                  operand_stack.add(new RandomResourceValue(l,r));
-                }
-                else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
-                {
-                  ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
-                  operand_stack.add(new ClampResourceValue(v,l,h));
-                }
-                else
-                {
-                  println("unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'. Exiting.");
-                  return;
-                }
               }
-              else// if (precedence[pindex] >= precedence[index])
-              {
-                //resolve the previous one first
-                char pc = ops.charAt(pindex);
-                ResourceValue r = pc == '~' ? null : operand_stack.remove(operand_stack.size() - 1);
-                ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                operand_stack.add(new ResourceExpression(l,r, pc));
-              }
-              
-              operator_stack.remove(operator_stack.size() - 1);
             }
             
             //now that we've processed everything, remove the left parenthesis (if need be)
@@ -251,62 +193,27 @@ class ResourceSet
               operator_stack.remove(operator_stack.size() - 1);
               expecting_operator = true;
             }
-            else
-            {
-              expecting_operator = false;
-            }
           }
+          //all other operators...
           else
           {
-            //before adding this operator to the stack we need to see if it's lower precedence than the previous stack entry
-            boolean continue_checking = true;
-            while (continue_checking && operator_stack.size() > 0)
+            //before adding this operator to the stack we need to evaluate the stack until we hit an operator with lower precedence
+            while (operator_stack.size() > 0)
             {
               int pindex = ops.indexOf(operator_stack.get(operator_stack.size() - 1));
               
-              if (pindex < 0)
+              if (pindex >= 0 && precedence[pindex] < precedence[index])
+                break;
+              
+              if (process_previous_operator(operator_stack, operand_stack, ops) && settings.debugging)
               {
-                if (operator_stack.get(operator_stack.size() - 1).equals("random"))
-                {
-                  ResourceValue r = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                  operand_stack.add(new RandomResourceValue(l,r));
-                }
-                else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
-                {
-                  ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                  ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
-                  operand_stack.add(new ClampResourceValue(v,l,h));
-                }
-                else
-                {
-                  println("unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'. Exiting.");
-                  return;
-                }
-                
-                operator_stack.remove(operator_stack.size() - 1);
-              }
-              else if (precedence[pindex] >= precedence[index])
-              {
-                //resolve the previous one first
-                char pc = ops.charAt(pindex);
-                ResourceValue r = pc == '~' ? null : operand_stack.remove(operand_stack.size() - 1);
-                ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
-                operand_stack.add(new ResourceExpression(l,r, pc));
-                
-                operator_stack.remove(operator_stack.size() - 1);
-              }
-              else
-              {
-                continue_checking = false;
+                println("Error parsing expression: failed on token '" + t + "' in expression \"" + chunks[chunk] + "\" in expression set \"" + _input + "\".");
+                break;
               }
             }
             
             //now add in this operator
             operator_stack.append(t);
-            
-            expecting_operator = false;
           }
         }
       }
@@ -314,9 +221,65 @@ class ResourceSet
       values[chunk] = operand_stack.get(0);
       types[chunk] = type_index_from_name(resource_name);
       
-      if (types[chunk] < 0)
-        println("Got '" + resource_name + "' from '" + chunks[chunk] + "'.");
+      if (types[chunk] < 0 && settings.debugging)
+        println("Error parsing expression: got '" + resource_name + "' as the resource name from '" + chunks[chunk] + "'.");
     }
+  }
+  
+  boolean process_previous_operator(StringList operator_stack, ArrayList<ResourceValue> operand_stack, String ops)
+  {
+    if (operator_stack.size() == 0 || operand_stack.size() == 0)
+      return true;
+    
+    int pindex = ops.indexOf(operator_stack.get(operator_stack.size() - 1));
+    
+    //functions
+    if (pindex < 0)
+    {
+      if (operator_stack.get(operator_stack.size() - 1).equals("random"))
+      {
+        if (operand_stack.size() < 2)
+          return true;
+        
+        ResourceValue r = operand_stack.remove(operand_stack.size() - 1);
+        ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
+        operand_stack.add(new RandomResourceValue(l,r));
+      }
+      else if (operator_stack.get(operator_stack.size() - 1).equals("clamp"))
+      {
+        if (operand_stack.size() < 3)
+          return true;
+        
+        ResourceValue h = operand_stack.remove(operand_stack.size() - 1);
+        ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
+        ResourceValue v = operand_stack.remove(operand_stack.size() - 1);
+        operand_stack.add(new ClampResourceValue(v,l,h));
+      }
+      else
+      {
+        if (settings.debugging)
+          println("Error parsing expression: unknown function name '" + operator_stack.get(operator_stack.size() - 1) + "'.");
+        
+        return true;
+      }
+    }
+    //regular operators
+    else
+    {
+      char pc = ops.charAt(pindex);
+      
+      if (pc != '~' && operand_stack.size() < 2)
+        return true;
+      
+      ResourceValue r = pc == '~' ? null : operand_stack.remove(operand_stack.size() - 1);
+      ResourceValue l = operand_stack.remove(operand_stack.size() - 1);
+      operand_stack.add(new ResourceExpression(l,r, pc));
+    }
+    
+    //either way, remove it from the stack
+    operator_stack.remove(operator_stack.size() - 1);
+    
+    return false;
   }
   
   String to_string()
@@ -452,7 +415,7 @@ class ResourceExpression extends ResourceValue
     if (op == '~')
       return "-" + left.to_string();
     
-    return left.to_string() + " " + op + " " + right.to_string();
+    return "(" + left.to_string() + " " + op + " " + right.to_string() + ")";
   }
   
   int evaluate()
@@ -522,6 +485,35 @@ String[] tokenize_string(String _input, String _split_keep, String _split_consum
     sl.append(cs);
   
   return sl.array();
+}
+
+String[] split_ignoring_enclosed(String _input)
+{
+  StringList strings = new StringList();
+  
+  String current = "";
+  int count = 0;
+  
+  for (int i = 0; i < _input.length(); i++)
+  {
+    if (_input.charAt(i) == '(')
+      ++count;
+    else if (_input.charAt(i) == ')')
+      --count;
+    else if (count == 0 && _input.charAt(i) == ',')
+    {
+      strings.append(current);
+      current = "";
+      continue;//so that the ',' isn't added below
+    }
+    
+    current += _input.charAt(i);
+  }
+  
+  if (current.length() > 0)
+    strings.append(current);
+  
+  return strings.array();
 }
 
 boolean is_letter(char _c)

@@ -160,12 +160,12 @@ class Button
           ttw = max(ttw, textWidth(cost_string));
         }
         
-        rect(mouseX, mouseY, ttw + 0.75f * text_height, tth);
+        rect(mouseX + 10.0f, mouseY, ttw + 0.75f * text_height, tth);
         fill(0);
-        text(tooltip, mouseX + 0.375f * text_height, mouseY + 0.5f * text_height);
+        text(tooltip, mouseX + 10.0f + 0.375f * text_height, mouseY + 0.5f * text_height);
         
         if (cost_string.length() > 0)
-          text(cost_string, mouseX + 0.375f * text_height, mouseY + 1.0f * text_height);
+          text(cost_string, mouseX + 10.0f + 0.375f * text_height, mouseY + 1.0f * text_height);
       }
     }
     else

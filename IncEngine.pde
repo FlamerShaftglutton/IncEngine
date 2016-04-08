@@ -90,9 +90,29 @@ void draw()
   }
   
   //create new workers (if need be)
-  while (workers.size() < resources[crew_type_index].get_value())
+  int num_crew = resources[crew_type_index].get_value();
+  while (workers.size() < num_crew)
   {
     workers.add(new Worker());
+  }
+  
+  while (workers.size() > num_crew)
+  {
+    for (int j = 0; j < buttons.length; j++)
+    {
+      for (int k = 0; k < buttons[j].myworkers.size(); k++)
+      {
+        if (buttons[j].myworkers.get(k) == workers.size() - 1)
+        {
+          buttons[j].myworkers.remove(k);
+          break;
+        }
+      }
+    }
+    
+    //return anything they may have spent at their last button position
+    workers.get(workers.size() - 1).return_click_stuff();
+    workers.remove(workers.size() - 1);
   }
   
   int num_inactive = 0;
@@ -149,6 +169,8 @@ void draw()
       println("Saving Game...");
     
     export_to_xml("SavedGame.xml");
+    
+    message_queue.add_message("Game Saved");
     
     if (settings.debugging)
       println("Done saving, time taken was ", millis() - ctime, " milliseconds");
