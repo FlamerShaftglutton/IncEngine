@@ -6,6 +6,7 @@ class Worker
   float h;
   
   boolean active;
+  boolean assigned;
   
   ResourceSet click_paid;
   
@@ -17,11 +18,12 @@ class Worker
     active = false;
     
     click_paid = null;
+    assigned = false;
   }
   
-  boolean clicked()
+  boolean clicked(float _mouseX, float _mouseY)
   {
-    return mouseX >= x && mouseY >= y && mouseX < x + w && mouseY < y + h;
+    return _mouseX >= x && _mouseY >= y && _mouseX < x + w && _mouseY < y + h;
   }
   
   void display()

@@ -31,11 +31,9 @@ class Button
   
   IntList myworkers;
   
-  Button(String _words, float _x, float _y, float _w, float _h, float _text_height, boolean _visible, boolean _always_invisible, boolean _enabled, boolean _autoclick, color _button_color, color _outline_color, color _text_color, color _disabled_text_color, color _cooldown_overlay_color, color _cooldown_worker_overlay_color)
+  Button(String _words, float _w, float _h, float _text_height, boolean _visible, boolean _always_invisible, boolean _enabled, boolean _autoclick, color _button_color, color _outline_color, color _text_color, color _disabled_text_color, color _cooldown_overlay_color, color _cooldown_worker_overlay_color)
   {
     words =_words;
-    x = _x;
-    y = _y;
     
     button_color = _button_color;
     outline_color = _outline_color;
@@ -70,9 +68,9 @@ class Button
     myworkers = new IntList();
   }
   
-  Button(String _text, float _x, float _y)
+  Button(String _text)
   {
-    this(_text, _x, _y, -1.0f, -1.0f, 32.0f, true, false, true, false, settings.default_button_color, settings.default_button_outline_color, settings.default_button_text_color, settings.default_disabled_text_color, settings.default_cooldown_overlay_color, settings.default_cooldown_worker_overlay_color);
+    this(_text, -1.0f, -1.0f, 32.0f, true, false, true, false, settings.default_button_color, settings.default_button_outline_color, settings.default_button_text_color, settings.default_disabled_text_color, settings.default_cooldown_overlay_color, settings.default_cooldown_worker_overlay_color);
   }
   
   void set_string(String _words)
@@ -132,13 +130,13 @@ class Button
     }
   }
   
-  boolean display_tooltip(float delta)
+  boolean display_tooltip(float _delta, float _mouseX, float _mouseY)
   {
-    boolean needs_displayed = visible && mouseX >= x && mouseX <= x + w && mouseY > y && mouseY < y + h;
+    boolean needs_displayed = visible && _mouseX >= x && _mouseX <= x + w && _mouseY > y && _mouseY < y + h;
     
     if (needs_displayed)
     {
-      tooltip_time += delta;
+      tooltip_time += _delta;
       
       if (tooltip_time > 1.0f && !tooltip.equals(""))
       {
@@ -160,12 +158,12 @@ class Button
           ttw = max(ttw, textWidth(cost_string));
         }
         
-        rect(mouseX + 10.0f, mouseY, ttw + 0.75f * text_height, tth);
+        rect(_mouseX + 10.0f, _mouseY, ttw + 0.75f * text_height, tth);
         fill(0);
-        text(tooltip, mouseX + 10.0f + 0.375f * text_height, mouseY + 0.5f * text_height);
+        text(tooltip, _mouseX + 10.0f + 0.375f * text_height, _mouseY + 0.5f * text_height);
         
         if (cost_string.length() > 0)
-          text(cost_string, mouseX + 10.0f + 0.375f * text_height, mouseY + 1.0f * text_height);
+          text(cost_string, _mouseX + 10.0f + 0.375f * text_height, _mouseY + 1.0f * text_height);
       }
     }
     else
@@ -243,9 +241,9 @@ class Button
     }
   }
   
-  boolean dragged_crew(int _crew_index)
+  boolean dragged_crew(int _crew_index, float _mouseX, float _mouseY)
   {
-    boolean dropped_here = visible && mouseX >= x && mouseX <= x + w && mouseY > y && mouseY < y + h;
+    boolean dropped_here = visible && _mouseX >= x && _mouseX <= x + w && _mouseY > y && _mouseY < y + h;
     
     if (dropped_here && cooldown != null)
     {
@@ -285,8 +283,9 @@ class Button
     return dropped_here;
   }
   
-  void update(float delta)
+  boolean update(float delta)
   {
+    boolean retval = false;
     enabled = true;
     
     //check if we can drop the hideuntil
@@ -301,6 +300,7 @@ class Button
       
       visible = met;
       enabled = met;
+      retval = true;
     }
     
     //check if we can drop the hideafter
@@ -323,6 +323,8 @@ class Button
           workers.get(myworkers.get(i)).return_click_stuff();
         }
         myworkers.clear();
+        
+        retval = true;
       }
     }
     
@@ -389,6 +391,19 @@ class Button
       }
     }
     
+    //do autoclicking if necessary
+    if (autoclick && enabled)
+      on_click();
+    
+    //return the dirty flag
+    return retval;
+  }
+  
+  void update_position(float _x, float _y)
+  {
+    x = _x;
+    y = _y;
+    
     //move this button's workers around so that they are drawn in the right places
     if (myworkers.size() >= 5)
     {
@@ -408,15 +423,11 @@ class Button
         workers.get(myworkers.get(i)).x = x + w + workers.get(myworkers.get(i)).w * 1.5f * (i + 0.5f);
       }
     }
-    
-    //do autoclicking if necessary
-    if (autoclick && enabled)
-      on_click();
   }
   
-  boolean clicked()
+  boolean clicked(float _mouseX, float _mouseY)
   {
-    boolean was_clicked = visible && enabled && mouseX >= x && mouseX <= x + w && mouseY > y && mouseY < y + h;
+    boolean was_clicked = visible && enabled && _mouseX >= x && _mouseX <= x + w && _mouseY > y && _mouseY < y + h;
 
     if (was_clicked)
     {

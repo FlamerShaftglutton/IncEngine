@@ -5,12 +5,12 @@ void import_from_xml(String _filename)
   XML xsettings = xml.getChild("settings");
   XML xresources = xml.getChild("resources");
   XML xworkers = xml.getChild("workers");
-  XML xbuttons = xml.getChild("buttons");
+  XML xtabs = xml.getChild("tabs");
   
   import_settings_from_xml(xsettings);//it's important that this goes first!
   import_resources_from_xml(xresources);
   import_workers_from_xml(xworkers);
-  import_buttons_from_xml(xbuttons);
+  import_tabs_from_xml(xtabs == null ? xml.getChild("buttons") : xtabs);
 }
 
 void import_settings_from_xml(XML xml)
@@ -139,162 +139,175 @@ void import_resources_from_xml(XML xml)
   }
 }
 
-void import_buttons_from_xml(XML xml)
+void import_tabs_from_xml(XML xml)
 {
   if (xml == null)
     return;
   
-  XML[] xbuttons = xml.getChildren("button");
-  
-  buttons = new Button[xbuttons.length];
-  for (int i = 0; i < xbuttons.length; i++)
+  XML[] xtabs = xml.getChildren("tab");
+  if (xml.getName().equals("buttons"))
   {
-    String  title = "?";
-    String  tooltip = "";
-    boolean display_cost_in_tooltip = settings.display_cost_in_tooltip;
+     xtabs = new XML[1];
+     xtabs[0] = new XML("tab");
+     xtabs[0].addChild("title").setContent("Tab Title");
+     xtabs[0].addChild(xml);
+  }
+  
+  tabs = new Tab[xtabs.length];
+  
+  for (int t = 0; t < xtabs.length; t++)
+  {
+    XML[] xbuttons = xtabs[t].getChild("buttons").getChildren("button");
     
-    float   x = xbuttons[i].getFloat("x",settings.default_text_size + settings.mq_width);
-    float   y = xbuttons[i].getFloat("y",float(i + 1) * settings.default_text_size * 1.5f);
-    float   w = xbuttons[i].getFloat("width",-1.0f);
-    float   h = xbuttons[i].getFloat("height",-1.0f);
-    float   text_height = xbuttons[i].getFloat("text_height",1.0f);
-    boolean visible = xbuttons[i].getString("visible","true").equals("true");
-    boolean always_invisible = xbuttons[i].getString("autoclick","false").equals("invisible");
-    boolean enabled = xbuttons[i].getString("enabled","true").equals("true");
-    boolean autoclick = always_invisible || xbuttons[i].getString("autoclick","false").equals("true");
-    color   button_color = string_to_color(xbuttons[i].getString("button_color",color_to_string(settings.default_button_color)));
-    color   outline_color = string_to_color(xbuttons[i].getString("outline_color",color_to_string(settings.default_button_outline_color)));
-    color   text_color = string_to_color(xbuttons[i].getString("text_color",color_to_string(settings.default_button_text_color)));
-    color   disabled_text_color = string_to_color(xbuttons[i].getString("disabled_text_color",color_to_string(settings.default_disabled_text_color)));
-    color   cooldown_overlay_color = string_to_color(xbuttons[i].getString("cooldown_overlay_color",color_to_string(settings.default_cooldown_overlay_color)));
-    color   cooldown_worker_overlay_color = string_to_color(xbuttons[i].getString("cooldown_worker_overlay_color",color_to_string(settings.default_cooldown_worker_overlay_color)));
+    Button[] butts = new Button[xbuttons.length];
+    String ttitle = xml.getChild("title") == null ? "" : xml.getChild("title").getContent();
+    int tindex = xml.getChild("index") == null ? t : xml.getChild("index").getIntContent();
     
-    boolean cooldown = false;
-    float   cooldown_max_amount = 0.0f;
-    float   cooldown_current_amount = 0.0f;
-    float   cooldown_worker_amount = 0.0f;
-    boolean cooldown_display = true;
-    
-    boolean converter = false;
-    String  click_innards = "";
-    String  reset_innards = "";
-    String  click_message = "";
-    String  reset_message = "";
-    
-    boolean hideuntil = false;
-    String  hideuntil_innards = "";
-    boolean hideuntil_all = false;
-    boolean hideuntil_alltime = true;
-    
-    boolean hideafter = false;
-    String  hideafter_innards = "";
-    boolean hideafter_all = false;
-    boolean hideafter_alltime = true;
-    
-    IntList worker_list = new IntList();
-    
-    //loop through each child and find some stuff
-    XML[] kids = xbuttons[i].getChildren();
-    
-    for (XML kid : kids)
+    for (int i = 0; i < xbuttons.length; i++)
     {
-      String n = kid.getName();
+      String  title = "?";
+      String  tooltip = "";
+      boolean display_cost_in_tooltip = settings.display_cost_in_tooltip;
       
-      if (n.equals("title"))
-        title = kid.getContent();
-      else if (n.equals("cooldown"))
+      float   w = xbuttons[i].getFloat("width",-1.0f);
+      float   h = xbuttons[i].getFloat("height",-1.0f);
+      float   text_height = xbuttons[i].getFloat("text_height",1.0f);
+      boolean visible = xbuttons[i].getString("visible","true").equals("true");
+      boolean always_invisible = xbuttons[i].getString("autoclick","false").equals("invisible");
+      boolean enabled = xbuttons[i].getString("enabled","true").equals("true");
+      boolean autoclick = always_invisible || xbuttons[i].getString("autoclick","false").equals("true");
+      color   button_color = string_to_color(xbuttons[i].getString("button_color",color_to_string(settings.default_button_color)));
+      color   outline_color = string_to_color(xbuttons[i].getString("outline_color",color_to_string(settings.default_button_outline_color)));
+      color   text_color = string_to_color(xbuttons[i].getString("text_color",color_to_string(settings.default_button_text_color)));
+      color   disabled_text_color = string_to_color(xbuttons[i].getString("disabled_text_color",color_to_string(settings.default_disabled_text_color)));
+      color   cooldown_overlay_color = string_to_color(xbuttons[i].getString("cooldown_overlay_color",color_to_string(settings.default_cooldown_overlay_color)));
+      color   cooldown_worker_overlay_color = string_to_color(xbuttons[i].getString("cooldown_worker_overlay_color",color_to_string(settings.default_cooldown_worker_overlay_color)));
+      
+      boolean cooldown = false;
+      float   cooldown_max_amount = 0.0f;
+      float   cooldown_current_amount = 0.0f;
+      float   cooldown_worker_amount = 0.0f;
+      boolean cooldown_display = true;
+      
+      boolean converter = false;
+      String  click_innards = "";
+      String  reset_innards = "";
+      String  click_message = "";
+      String  reset_message = "";
+      
+      boolean hideuntil = false;
+      String  hideuntil_innards = "";
+      boolean hideuntil_all = false;
+      boolean hideuntil_alltime = true;
+      
+      boolean hideafter = false;
+      String  hideafter_innards = "";
+      boolean hideafter_all = false;
+      boolean hideafter_alltime = true;
+      
+      IntList worker_list = new IntList();
+      
+      //loop through each child and find some stuff
+      XML[] kids = xbuttons[i].getChildren();
+      
+      for (XML kid : kids)
       {
-        cooldown = true;
-        if (kid.listChildren().length > 1)
-        {
-          XML kdisplay = kid.getChild("display");
-          XML kworker_amount = kid.getChild("worker_amount");
-          XML kcurrent_amount = kid.getChild("current_amount");
-          XML kmax_amount = kid.getChild("max_amount");
-          
-          if (kdisplay != null)
-            cooldown_display = kdisplay.getContent().equals("true");
-          
-          if (kworker_amount != null)
-            cooldown_worker_amount = kworker_amount.getFloatContent();
-          
-          if (kcurrent_amount != null)
-            cooldown_current_amount = kcurrent_amount.getFloatContent();
-          
-          if (kmax_amount != null)
-            cooldown_max_amount = kmax_amount.getFloatContent();
-        }
-        else
-        {
-          cooldown_max_amount = kid.getFloatContent();
-        }
-      }
-      else if (n.equals("hideuntil"))
-      {
-        hideuntil = true;
-        hideuntil_innards = kid.getContent();
-        hideuntil_all = kid.getString("all","false").equals("true");
-      }
-      else if (n.equals("hideafter"))
-      {
-        hideafter = true;
-        hideafter_innards = kid.getContent();
-        hideafter_all = kid.getString("all","false").equals("true");
-      }
-      else if (n.equals("tooltip"))
-      {
-        tooltip = kid.getContent();
+        String n = kid.getName();
         
-        display_cost_in_tooltip = kid.getString("display_cost",settings.display_cost_in_tooltip ? "true" : "false") == "true";
-      }
-      else if (n.equals("converter"))
-      {
-        converter = true;
-        XML kclick = kid.getChild("click");
-        XML kreset = kid.getChild("reset");
-        
-        if (kclick != null)
+        if (n.equals("title"))
+          title = kid.getContent();
+        else if (n.equals("cooldown"))
         {
-          click_innards = kclick.getContent();
-          click_message = kclick.getString("message","");
+          cooldown = true;
+          if (kid.listChildren().length > 1)
+          {
+            XML kdisplay = kid.getChild("display");
+            XML kworker_amount = kid.getChild("worker_amount");
+            XML kcurrent_amount = kid.getChild("current_amount");
+            XML kmax_amount = kid.getChild("max_amount");
+            
+            if (kdisplay != null)
+              cooldown_display = kdisplay.getContent().equals("true");
+            
+            if (kworker_amount != null)
+              cooldown_worker_amount = kworker_amount.getFloatContent();
+            
+            if (kcurrent_amount != null)
+              cooldown_current_amount = kcurrent_amount.getFloatContent();
+            
+            if (kmax_amount != null)
+              cooldown_max_amount = kmax_amount.getFloatContent();
+          }
+          else
+          {
+            cooldown_max_amount = kid.getFloatContent();
+          }
         }
-        
-        if (kreset != null)
+        else if (n.equals("hideuntil"))
         {
-          reset_innards = kreset.getContent();
-          reset_message = kreset.getString("message","");
+          hideuntil = true;
+          hideuntil_innards = kid.getContent();
+          hideuntil_all = kid.getString("all","false").equals("true");
+        }
+        else if (n.equals("hideafter"))
+        {
+          hideafter = true;
+          hideafter_innards = kid.getContent();
+          hideafter_all = kid.getString("all","false").equals("true");
+        }
+        else if (n.equals("tooltip"))
+        {
+          tooltip = kid.getContent();
+          
+          display_cost_in_tooltip = kid.getString("display_cost",settings.display_cost_in_tooltip ? "true" : "false") == "true";
+        }
+        else if (n.equals("click"))
+        {
+          converter = true;
+  
+          click_innards = kid.getContent();
+          click_message = kid.getString("message","");
+        }
+        else if (n.equals("reset"))
+        {        
+          converter = true;
+          
+          reset_innards = kid.getContent();
+          reset_message = kid.getString("message","");
+        }
+        else if (n.equals("workers"))
+        {
+          String[] worker_indexes = trim(split(kid.getContent(),","));
+          
+          for (String wo : worker_indexes)
+          {
+            if (!wo.equals(""))
+              worker_list.append(parseInt(wo));
+          }
         }
       }
-      else if (n.equals("workers"))
-      {
-        String[] worker_indexes = trim(split(kid.getContent(),","));
-        
-        for (String wo : worker_indexes)
-        {
-          if (!wo.equals(""))
-            worker_list.append(parseInt(wo));
-        }
-      }
+      
+      //now construct the button
+      butts[i] = new Button(title, w, h, text_height * settings.default_text_size, visible, always_invisible, enabled, autoclick, button_color, outline_color, text_color, disabled_text_color, cooldown_overlay_color, cooldown_worker_overlay_color);
+      butts[i].tooltip = tooltip;
+      butts[i].display_cost_in_tooltip = display_cost_in_tooltip;
+      
+      if (cooldown)
+        butts[i].cooldown = new Cooldown(cooldown_current_amount,cooldown_max_amount,cooldown_display,cooldown_worker_amount);
+      
+      if (hideuntil)
+        butts[i].hideuntil = new Prerequisite(hideuntil_innards, hideuntil_all, hideuntil_alltime);
+      
+      if (hideafter)
+        butts[i].hideafter = new Prerequisite(hideafter_innards, hideafter_all, hideafter_alltime);
+      
+      if (converter)
+        butts[i].converter = new Converter(click_innards, reset_innards, click_message, reset_message);
+      
+      butts[i].myworkers = worker_list;
     }
     
-    //now construct the button
-    buttons[i] = new Button(title, x, y, w, h, text_height * settings.default_text_size, visible, always_invisible, enabled, autoclick, button_color, outline_color, text_color, disabled_text_color, cooldown_overlay_color, cooldown_worker_overlay_color);
-    buttons[i].tooltip = tooltip;
-    buttons[i].display_cost_in_tooltip = display_cost_in_tooltip;
-    
-    if (cooldown)
-      buttons[i].cooldown = new Cooldown(cooldown_current_amount,cooldown_max_amount,cooldown_display,cooldown_worker_amount);
-    
-    if (hideuntil)
-      buttons[i].hideuntil = new Prerequisite(hideuntil_innards, hideuntil_all, hideuntil_alltime);
-    
-    if (hideafter)
-      buttons[i].hideafter = new Prerequisite(hideafter_innards, hideafter_all, hideafter_alltime);
-    
-    if (converter)
-      buttons[i].converter = new Converter(click_innards, reset_innards, click_message, reset_message);
-    
-    buttons[i].myworkers = worker_list;
+    tabs[tindex] = new Tab(ttitle, butts);
   }
 }
 

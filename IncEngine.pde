@@ -1,9 +1,11 @@
 Resource[] resources;
-Button[] buttons;
+Tab[] tabs;
+//Button[] buttons;
 ArrayList<Worker> workers;
 Settings settings;
 MessageQueue message_queue;
 
+int current_tab_index;
 int dragged_worker_index;
 PImage worker_sprite;
 
@@ -37,6 +39,7 @@ void setup()
   worker_sprite = loadImage(settings.worker_sprite_path);
   
   dragged_worker_index = -1;
+  current_tab_index = 0;
   player_type_index = type_index_from_name("Player");
   crew_type_index = type_index_from_name("Crew");
   
@@ -58,8 +61,8 @@ void draw()
   
   float delta = settings.time_multiplier * float(ctime - ptime) / 1000.0f;
   
-  float y = settings.default_text_size;
-  for (Button b : buttons)
+  float y = settings.default_text_size * 3;
+  for (Button b : tabs[current_tab_index].buttons)
   {
     b.update(delta);
     
@@ -67,6 +70,8 @@ void draw()
     {
       b.y = y;
       y += settings.default_text_size * 2.0f;
+      
+      
     }
     else
     {
@@ -98,14 +103,17 @@ void draw()
   
   while (workers.size() > num_crew)
   {
-    for (int j = 0; j < buttons.length; j++)
+    for (int t = 0; t < tabs.length; t++)
     {
-      for (int k = 0; k < buttons[j].myworkers.size(); k++)
+      for (int j = 0; j < tabs[t].buttons.length; j++)
       {
-        if (buttons[j].myworkers.get(k) == workers.size() - 1)
+        for (int k = 0; k < tabs[t].buttons[j].myworkers.size(); k++)
         {
-          buttons[j].myworkers.remove(k);
-          break;
+          if (tabs[t].buttons[j].myworkers.get(k) == workers.size() - 1)
+          {
+            tabs[t].buttons[j].myworkers.remove(k);
+            break;
+          }
         }
       }
     }
@@ -118,17 +126,7 @@ void draw()
   int num_inactive = 0;
   for (int i = 0; i < workers.size(); i++)
   {
-    boolean assigned = false;
-    for (int j = 0; j < buttons.length; j++)
-    {
-      if (buttons[j].myworkers.hasValue(i))
-      {
-        assigned = true;
-        break;
-      }
-    }
-    
-    if (!assigned)
+    if (!workers.get(i).assigned)
     {
       //return anything they may have spent at their last button position
       workers.get(i).return_click_stuff();
@@ -144,17 +142,9 @@ void draw()
   
   if (dragged_worker_index >= 0)
   {
+    
     workers.get(dragged_worker_index).x = mouseX - workers.get(dragged_worker_index).w / 2.0f;
     workers.get(dragged_worker_index).y = mouseY - workers.get(dragged_worker_index).h / 2.0f;
-  }
-  
-  for (Worker w : workers)
-    w.display();
-  
-  for (Button b : buttons)
-  {
-    if (b.display_tooltip(delta))
-      break;
   }
   
   //draw the message queue
@@ -184,7 +174,7 @@ void mousePressed()
   
   for (int i = 0; i < workers.size(); i++)
   {
-    if (workers.get(i).clicked())
+    if (workers.get(i).clicked(mouseX, mouseY))
     {
       dragged_worker_index = i;
       break;
@@ -196,15 +186,12 @@ void mouseReleased()
 {
   if (dragged_worker_index >= 0)
   {
-    for (int i = 0; i < buttons.length; i++)
-    {
-      buttons[i].dragged_crew(dragged_worker_index);
-    }
+    tabs[current_tab_index].dragged_worker(dragged_worker_index, mouseX, mouseY);
     
     dragged_worker_index = -1;
   }
   else
   {
-    for (int i = 0; i < buttons.length && !buttons[i].clicked(); i++);
+    tabs[current_tab_index].clicked(mouseX, mouseY);
   }
 }

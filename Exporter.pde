@@ -3,7 +3,7 @@ void export_to_xml(String _filename)
   XML root = new XML("game");
   
   export_resources_to_xml(root);
-  export_buttons_to_xml(root);
+  export_tabs_to_xml(root);
   export_workers_to_xml(root);
   export_settings_to_xml(root);
   
@@ -25,92 +25,96 @@ void export_resources_to_xml(XML root)
   }
 }
 
-void export_buttons_to_xml(XML root)
+void export_tabs_to_xml(XML root)
 {
-  XML bs = root.addChild("buttons");
+  XML ts = root.addChild("tabs");
   
-  for (int i = 0; i < buttons.length; i++)
+  for (int t = 0; t < tabs.length; t++)
   {
-    XML b = bs.addChild("button");
+    ts.addChild("title").setContent(tabs[t].title);
+    ts.addChild("index").setContent(str(t));
     
-    b.setFloat("x", buttons[i].x);
-    b.setFloat("y", buttons[i].y);
-    b.setFloat("width", buttons[i].w);
-    b.setFloat("height", buttons[i].h);
-    b.setFloat("text_height", buttons[i].text_height / settings.default_text_size);
-    b.setString("visible", buttons[i].visible ? "true" : "false");
-    b.setString("enabled", buttons[i].enabled ? "true" : "false");
+    XML bs = ts.addChild("buttons");
     
-    if (buttons[i].always_invisible)
-      b.setString("autoclick","invisible");
-    else if (buttons[i].autoclick)
-      b.setString("autoclick","true");
-    
-        
-    b.addChild("title").setContent(buttons[i].get_string());
-    if (!buttons[i].tooltip.equals(""))
+    for (int i = 0; i < tabs[t].buttons.length; i++)
     {
-      XML ttc = b.addChild("tooltip");
-      ttc.setContent(buttons[i].tooltip);
-      if (buttons[i].display_cost_in_tooltip != settings.display_cost_in_tooltip)
-        ttc.setString("display_cost","true");
-    }
-    
-    if (buttons[i].cooldown != null)
-    {
-      XML c = b.addChild("cooldown");
+      XML b = bs.addChild("button");
       
-      c.addChild("current_amount").setFloatContent(buttons[i].cooldown.current_amount);
-      c.addChild("worker_amount").setFloatContent(buttons[i].cooldown.current_worker_amount);
-      c.addChild("max_amount").setFloatContent(buttons[i].cooldown.max_amount);
-      c.addChild("display").setContent(buttons[i].cooldown.display ? "true" : "false");
-    }
-    
-    if (buttons[i].hideuntil != null)
-    {
-      XML cc = b.addChild("hideuntil");
-      cc.setContent(buttons[i].hideuntil.list.to_string());
-      cc.setString("all",buttons[i].hideuntil.all ? "true" : "false");
-      cc.setString("alltime",buttons[i].hideuntil.alltime ? "true" : "false");
-    }
-    
-    if (buttons[i].hideafter != null)
-    {
-      XML cc = b.addChild("hideafter");
-      cc.setContent(buttons[i].hideafter.list.to_string());
-      cc.setString("all",buttons[i].hideafter.all ? "true" : "false");
-      cc.setString("alltime",buttons[i].hideafter.alltime ? "true" : "false");
-    }
-    
-    if (buttons[i].converter != null)
-    {
-      XML c = b.addChild("converter");
+      b.setFloat("width", tabs[t].buttons[i].w);
+      b.setFloat("height", tabs[t].buttons[i].h);
+      b.setFloat("text_height", tabs[t].buttons[i].text_height / settings.default_text_size);
+      b.setString("visible", tabs[t].buttons[i].visible ? "true" : "false");
+      b.setString("enabled", tabs[t].buttons[i].enabled ? "true" : "false");
       
-      if (buttons[i].converter.click != null || !buttons[i].converter.click_message.equals(""))
-      {
-        XML cc = c.addChild("click");
-        
-        if (buttons[i].converter.click != null)
-          cc.setContent(buttons[i].converter.click.to_string());
+      if (tabs[t].buttons[i].always_invisible)
+        b.setString("autoclick","invisible");
+      else if (tabs[t].buttons[i].autoclick)
+        b.setString("autoclick","true");
+      
           
-        if (!buttons[i].converter.click_message.equals(""))
-          cc.setString("message",buttons[i].converter.click_message);
+      b.addChild("title").setContent(tabs[t].buttons[i].get_string());
+      if (!tabs[t].buttons[i].tooltip.equals(""))
+      {
+        XML ttc = b.addChild("tooltip");
+        ttc.setContent(tabs[t].buttons[i].tooltip);
+        if (tabs[t].buttons[i].display_cost_in_tooltip != settings.display_cost_in_tooltip)
+          ttc.setString("display_cost","true");
       }
       
-      if (buttons[i].converter.reset != null || !buttons[i].converter.reset_message.equals(""))
+      if (tabs[t].buttons[i].cooldown != null)
       {
-        XML cc = c.addChild("reset");
+        XML c = b.addChild("cooldown");
         
-        if (buttons[i].converter.reset != null)
-          cc.setContent(buttons[i].converter.reset.to_string());
-          
-        if (!buttons[i].converter.reset_message.equals(""))
-          cc.setString("message",buttons[i].converter.reset_message);
+        c.addChild("current_amount").setFloatContent(tabs[t].buttons[i].cooldown.current_amount);
+        c.addChild("worker_amount").setFloatContent(tabs[t].buttons[i].cooldown.current_worker_amount);
+        c.addChild("max_amount").setFloatContent(tabs[t].buttons[i].cooldown.max_amount);
+        c.addChild("display").setContent(tabs[t].buttons[i].cooldown.display ? "true" : "false");
       }
+      
+      if (tabs[t].buttons[i].hideuntil != null)
+      {
+        XML cc = b.addChild("hideuntil");
+        cc.setContent(tabs[t].buttons[i].hideuntil.list.to_string());
+        cc.setString("all",tabs[t].buttons[i].hideuntil.all ? "true" : "false");
+        cc.setString("alltime",tabs[t].buttons[i].hideuntil.alltime ? "true" : "false");
+      }
+      
+      if (tabs[t].buttons[i].hideafter != null)
+      {
+        XML cc = b.addChild("hideafter");
+        cc.setContent(tabs[t].buttons[i].hideafter.list.to_string());
+        cc.setString("all",tabs[t].buttons[i].hideafter.all ? "true" : "false");
+        cc.setString("alltime",tabs[t].buttons[i].hideafter.alltime ? "true" : "false");
+      }
+      
+      if (tabs[t].buttons[i].converter != null)
+      {
+        if (tabs[t].buttons[i].converter.click != null || !tabs[t].buttons[i].converter.click_message.equals(""))
+        {
+          XML cc = b.addChild("click");
+          
+          if (tabs[t].buttons[i].converter.click != null)
+            cc.setContent(tabs[t].buttons[i].converter.click.to_string());
+            
+          if (!tabs[t].buttons[i].converter.click_message.equals(""))
+            cc.setString("message",tabs[t].buttons[i].converter.click_message);
+        }
+        
+        if (tabs[t].buttons[i].converter.reset != null || !tabs[t].buttons[i].converter.reset_message.equals(""))
+        {
+          XML cc = b.addChild("reset");
+          
+          if (tabs[t].buttons[i].converter.reset != null)
+            cc.setContent(tabs[t].buttons[i].converter.reset.to_string());
+            
+          if (!tabs[t].buttons[i].converter.reset_message.equals(""))
+            cc.setString("message",tabs[t].buttons[i].converter.reset_message);
+        }
+      }
+      
+      if (tabs[t].buttons[i].myworkers != null && tabs[t].buttons[i].myworkers.size() > 0)
+        b.addChild("workers").setContent(join(nf(tabs[t].buttons[i].myworkers.array(), 0), ","));
     }
-    
-    if (buttons[i].myworkers != null && buttons[i].myworkers.size() > 0)
-      b.addChild("workers").setContent(join(nf(buttons[i].myworkers.array(), 0), ","));
   }
 }
 
