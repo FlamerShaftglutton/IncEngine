@@ -1,246 +1,174 @@
 <game>
-	<buttons>
-		<button>
-			<title>Make a greeting card</title>
-			<converter>
-				<click>-1 Paper, -1 Player</click>
-				<reset>1 Player, 1 Card</reset>
-			</converter>
-			<cooldown>2</cooldown>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Make a cute penguin-themed greeting card out of paper.</tooltip>
-		</button>
-		<button>
-			<title>Buy Paper</title>
-			<converter>
-				<click>-1 Player, -5 Money</click>
-				<reset>1 Player, 50 Paper</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>2 Cards</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Pick up some more paper for making gift cards.</tooltip>
-		</button>
-		<button>
-			<title>Sell a card</title>
-			<converter>
-				<click message="Someone bought one of your cards!">-1 Cart, -1 Player, -1 Card</click>
-				<reset>1 Cart, 1 Player, clamp(2 + Penguins, 2, 10) Money</reset>
-			</converter>
-			<cooldown>3</cooldown>
-			<hideuntil>3 Cards</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Man your cart and sell a gift card.</tooltip>
-		</button>
-		<button>
-			<title>Buy Fabric</title>
-			<converter>
-				<click>-1 Player, -20 Money</click>
-				<reset>1 Player, 10 Fabric</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>20 Paper</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Buy some cute fabric. With some fluff you could sew something cute!</tooltip>
-		</button>
-		<button>
-			<title>Buy Fluff</title>
-			<converter>
-				<click>-1 Player, -10 Money</click>
-				<reset>1 Player, 10 Fluff</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>20 Paper</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Buy some fluff. With some fabric you could make something cute!</tooltip>
-		</button>
-		<button>
-			<title>Make a Penguin Plushie</title>
-			<converter>
-				<click>-1 Player, -2 Fabric, -1 Fluff</click>
-				<reset message="You made a penguin plushie. It's so cute!">1 Player, 1 Plushie</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>1 Fabric, 1 Fluff</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Sew a penguin plushie using some fabric and fluff.</tooltip>
-		</button>
-		<button>
-			<title>Sell a Penguin Plushie</title>
-			<converter>
-				<click>-1 Cart, -1 Player, -1 Plushie</click>
-				<reset>1 Cart, 1 Player, clamp(15 + (5 * Penguins),15,35) Money</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>1 Plushie</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Sell a penguin plushie out of your cart!</tooltip>
-		</button>
-		<button>
-			<title>Hire some help</title>
-			<converter>
-				<click>-100 Money</click>
-				<reset>1 Crew</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>100 Money</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Hire an employee to help you out.</tooltip>
-		</button>
-		<button>
-			<title>Buy another Cart</title>
-			<converter>
-				<click>-1 Player, -400 Money</click>
-				<reset>1 Player, 1 Cart, 1 Real Cart</reset>
-			</converter>
-			<cooldown>6</cooldown>
-			<hideuntil>2 Crew</hideuntil>
-			<hideafter all="false">5 Real Cart, 1 Tier</hideafter>
-			<tooltip>Get another cart to sell stuff out of.</tooltip>
-		</button>
-		<button>
-			<title>Buy a run-down exhibit</title>
-			<converter>
-				<click>-1 Player, -2000 Money</click>
-				<reset>1 Player, 1 Dirty Exhibit</reset>
-			</converter>
-			<cooldown>30</cooldown>
-			<hideuntil>3 Crew</hideuntil>
-			<hideafter>1 Dirty Exhibit</hideafter>
-			<tooltip>You can't really do anything with it, but it's cool!</tooltip>
-		</button>
-		<button>
-			<title>Clean up the exhibit</title>
-			<converter>
-				<click>-1 Player, 1 Dirty Exhibit</click>
-				<reset>1 Player, 1 Clean Exhibit</reset>
-			</converter>
-			<cooldown>60</cooldown>
-			<hideuntil>1 Dirty Exhibit</hideuntil>
-			<hideafter>1 Clean Exhibit</hideafter>
-			<tooltip display_cost="false">Clean all the gunk out to make way for something cool!</tooltip>
-		</button>
-		<button>
-			<title>Adopt a Penguin</title>
-			<converter>
-				<click>-1 Player, (1 + Penguins) * -1000 - 1000 Money</click>
-				<reset message="You adopted a penguin. She's so cute!">1 Player, 1 Penguin, 1 Penguin per worker</reset>
-			</converter>
-			<cooldown>10</cooldown>
-			<hideuntil>1 Clean Exhibit</hideuntil>
-			<hideafter>10 Penguins</hideafter>
-			<tooltip>You need something for that exhibit!</tooltip>
-		</button>
-		<button>
-			<title>Buy Fish</title>
-			<converter>
-				<click>-1 Player, -10 Money</click>
-				<reset>1 Player, 20 Fish</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>1 Clean Exhibit</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>If you don't feed your penguins something they'll get taken away!</tooltip>
-		</button>
-		<button autoclick="true">
-			<title>Feed Penguins</title>
-			<converter>
-				<click>clamp(-20 * Penguins,-Fish,-20 * Penguins) Fish</click>
-				<reset>clamp((20 * Penguins - Fish) / 20,-Strikes,1) Strikes</reset>
-			</converter>
-			<cooldown>15</cooldown>
-			<hideuntil>1 Penguin</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>Your penguins will each eat 20 fish when this is done.</tooltip>
-		</button>
-		<button autoclick="invisible">
-			<title>Kill penguins</title>
-			<converter>
-				<click>-3 Strikes</click>
-				<reset message="Oh no! One of your penguins was taken away because you couldn't feed her!">-1 Penguin, -1 Penguin per worker</reset>
-			</converter>
-			<cooldown>15</cooldown>
-			<hideuntil>1 Penguin</hideuntil>
-			<hideafter>1 Tier</hideafter>
-		</button>
-		<button>
-			<title>Buy a toy for the penguins</title>
-			<converter>
-				<click>-1 Player,-1000 Money</click>
-				<reset message="The penguins love their new toy! They look smarter already.">1 Player, 1 Toy</reset>
-			</converter>
-			<cooldown>15</cooldown>
-			<hideuntil>3 Penguins</hideuntil>
-			<hideafter>5 Toys</hideafter>
-			<tooltip>Toys that will engage penguins and supposedly make them smarter!</tooltip>
-		</button>
-		<button>
-			<title>Sell tickets to see your penguins</title>
-			<converter>
-				<click>-1 Player, -1 Penguin per worker</click>
-				<reset>1 Player, (5 + Penguins + Toys) Money, 1 Penguin per worker</reset>
-			</converter>
-			<cooldown>8</cooldown>
-			<hideuntil>2 Penguins</hideuntil>
-			<hideafter>1 Tier</hideafter>
-			<tooltip>People will pay to get a look at your beautiful penguins!</tooltip>
-		</button>
-		<button autoclick="invisible">
-			<title>Move to Tier 2</title>
-			<converter>
-				<click message="Your penguins have become self-aware. You now leave your company to run itself as you help the penguins grow.">(-Crew) Crew</click>
-				<reset>1 Tier, 1 Company</reset>
-			</converter>
-			<cooldown>0.5</cooldown>
-			<hideuntil all="true">5 Toys, 10 Penguins</hideuntil>
-			<hideafter>1 Tier</hideafter>
-		</button>
-		
-		<!-- Tier 2 -->
-		<button autoclick="true">
-			<title>Collect Revenue</title>
-			<converter>
-				<click>-1 Company</click>
-				<reset>1 Company, 317 Money</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>1 Tier</hideuntil>
-			<hideafter>2 Tier</hideafter>
-			<tooltip>Your company now generates money for you without your direct involvement.</tooltip>
-		</button>
-		<button>
-			<title>Sit tight</title>
-			<converter>
-				<click>-1 Player</click>
-				<reset>1 Player</reset>
-			</converter>
-			<cooldown>5</cooldown>
-			<hideuntil>1 Tier</hideuntil>
-			<hideafter>2 Tier</hideafter>
-			<tooltip>Coming soon!</tooltip>
-		</button>
-	</buttons>
+	<tabs>
+		<tab index="0">
+			<title>Small Business</title>
+			<buttons>
+				<!-- Paper Branch -->
+				<button>
+					<title>Buy Paper</title>
+					<click>-1 Player, -5 Money</click>
+					<reset>1 Player, 20 Paper</reset>
+					<cooldown>5</cooldown>
+					<hideafter>1 Fluff, 1 Fabric</hideafter>
+					<tooltip>Pick up some more paper for making gift cards.</tooltip>
+				</button>
+				<button>
+					<title>Make a greeting card</title>
+					<click>-1 Paper, -1 Player</click>
+					<reset>1 Player, 1 Card</reset>
+					<cooldown>2</cooldown>
+					<hideuntil>1 Paper</hideuntil>
+					<hideafter>1 Bindery</hideafter>
+					<tooltip>Make a cute penguin-themed greeting card out of paper.</tooltip>
+				</button>
+				<button>
+					<title>Make a book</title>
+					<click>-10 Paper, -1 Player</click>
+					<reset>1 Player, 1 Book</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>1 Bindery</hideuntil>
+					<tooltip>Make a book about how great penguins are.</tooltip>
+				</button>
+				<button>
+					<title>Sell a greeting card</title>
+					<click>-1 Player, -1 Card, -1 Cart</click>
+					<reset>1 Player, 2 Money, 1 Cart, (Bindery) Leftovers</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>5 Cards</hideuntil>
+					<hideafter>1000000 Leftovers</hideafter>
+					<tooltip>Man your cart and sell a greeting card on the streets.</tooltip>
+				</button>
+				<button>
+					<title>Sell a book</title>
+					<click>-1 Player, -1 Cart, -1 Book</click>
+					<reset>1 Player, 1 Cart, 15 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>1 Book</hideuntil>
+					<tooltip>Man your cart and sell a book on the streets.</tooltip>
+				</button>
+				<button>
+					<title>Buy a book bindery</title>
+					<click>-1 Player, -500 Money</click>
+					<reset message="You now make books instead of greeting cards!">1 Player, 1 Bindery, clamp(1000000 - Cards, 0, 1000000) Leftovers</reset>
+					<cooldown>10</cooldown>
+					<hideuntil all="true">2 Real Carts,1 Paper</hideuntil>
+					<hideafter>1 Bindery</hideafter>
+					<tooltip>Shift your business to making books instead of greeting cards.</tooltip>
+				</button>
+				
+				<!-- Fabric Branch -->
+				<button>
+					<title>Buy Fabric</title>
+					<click>-1 Player, -20 Money</click>
+					<reset>1 Player, 10 Fabric</reset>
+					<cooldown>5</cooldown>
+					<hideafter>1 Paper</hideafter>
+					<tooltip>Combine this with some fluff and you could sew something cute!</tooltip>
+				</button>
+				<button>
+					<title>Buy Fluff</title>
+					<click>-1 Player, -10 Money</click>
+					<reset>1 Player, 10 Fluff</reset>
+					<cooldown>5</cooldown>
+					<hideafter>1 Paper, 1 Sweatshop</hideafter>
+					<tooltip>Combine this with some fabric and you could sew something cute!</tooltip>
+				</button>
+				<button>
+					<title>Make a Penguin Plushie</title>
+					<click>-1 Player, -1 Fluff, -2 Fabric</click>
+					<reset>1 Player, 1 Plushie</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>1 Fluff, 1 Fabric</hideuntil>
+					<hideafter>1000000 Leftovers</hideafter>
+					<tooltip>Sew a penguin plushie using some fabric and fluff.</tooltip>
+				</button>
+				<button>
+					<title>Make a Penguin Shirt</title>
+					<click>-1 Player, -5 Fabric</click>
+					<reset>1 Player, 1 Shirt</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>1 Sweatshop</hideuntil>
+					<tooltip>Sew a cute penguin-themed shirt using some fabric.</tooltip>
+				</button>
+				<button>
+					<title>Sell a Penguin Plushie</title>
+					<click>-1 Player, -1 Cart, -1 Plushie</click>
+					<reset>15 Money, 1 Player, 1 Cart, (Sweatshop) Leftovers</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>3 Plushies</hideuntil>
+					<hideafter>1000000 Leftovers</hideafter>
+					<tooltip>Man your cart and sell a plushie on the streets.</tooltip>
+				</button>
+				<button>
+					<title>Sell a Penguin Shirt</title>
+					<click>-1 Player, -1 Cart, -1 Shirt</click>
+					<reset>1 Player, 1 Cart, 25 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>1 Shirt</hideuntil>
+					<tooltip>Man your cart and sell a t-shirt on the streets.</tooltip>
+				</button>
+				<button>
+					<title>Buy a Clothing Factory</title>
+					<click>-1 Player, -1200 Money</click>
+					<reset message="You now make penguin-themed shirts instead of plushies!">1 Player, 1 Sweatshop, clamp(1000000 - (Plushies + Fluff), 0, 1000000) Leftovers</reset>
+					<cooldown>10</cooldown>
+					<hideuntil all="true">2 Real Carts, 1 Fabric</hideuntil>
+					<hideafter>1 Sweatshop</hideafter>
+					<tooltip>Shift your business to making shirts instead of plushies.</tooltip>
+				</button>
+				
+				<!-- All Branches -->
+				<button>
+					<title>Hire an employee</title>
+					<click>-1 Player, -100 Money</click>
+					<reset message="You now have someone else to do some of the heavy lifting! Drag them onto a task to get them started.">1 Player, 1 Crew</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>50 Money</hideuntil>
+					<tooltip>Hire an employee to help you out.</tooltip>
+					<hideafter>20 Crew</hideafter>
+				</button>
+				<button>
+					<title>Buy another cart</title>
+					<click>-1 Player, -400 Money</click>
+					<reset message="You now have another cart. You can sell more things at the same time.">1 Player, 1 Cart, 1 Real Cart</reset>
+					<cooldown>7</cooldown>
+					<hideuntil>2 Crew</hideuntil>
+					<hideafter>5 Real Carts</hideafter>
+					<tooltip>Buy another cart. You'll need this to have more than 1 employee selling things!</tooltip>
+				</button>
+			</buttons>
+		</tab>
+		<tab index="1">
+			<title>Zoo</title>
+			<buttons>
+				<button>
+					<title>Coming soon!</title>
+					<click>-1 Player</click>
+					<reset>1 Player</reset>
+					<cooldown>10</cooldown>
+					<hideuntil>1 Bindery, 1 Sweatshop</hideuntil>
+					<tooltip>This does nothing yet, but stayed tuned!</tooltip>
+				</button>
+			</buttons>
+		</tab>
+	</tabs>
 	
 	<resources>
-		<resource>Money</resource>
-		<resource value="10">Paper</resource>
+		<resource value="30">Money</resource>
+		<resource min="1">Paper</resource>
 		<resource min="1">Card,Cards</resource>
+		<resource min="1">Book, Books</resource>
+		<resource min="-1">Bindery, Binderies</resource>
+		<resource min="-1">Leftovers</resource>
 		<resource min="1">Fabric</resource>
 		<resource min="1">Fluff</resource>
-		<resource min="1">Plushie</resource>
+		<resource min="1">Plushie, Plushies</resource>
+		<resource min="1">Shirt, Shirts</resource>
+		<resource min="-1">Sweatshop, Sweatshops</resource>
 		<resource value="1">Cart,Carts</resource>
 		<resource min = "-1" value="1">Real Cart, Real Carts</resource>
-		<resource min="-1">Dirty Exhibit, Dirty Exhibits</resource>
-		<resource min="-1">Clean Exhibit, Clean Exhibits</resource>
-		<resource min="1">Fish</resource>
-		<resource min="1">Penguin, Penguins</resource>
-		<resource min="-1">Penguin per worker, Penguins per worker</resource>
-		<resource min="1">Strike, Strikes</resource>
-		<resource min="1">Toy, Toys</resource>
-		<resource min="-1">Company, Companies</resource>
 		<resource min="-1" value="1">Player,Players</resource>
 		<resource min="2">Crew</resource>
-		<resource min="-1">Tier</resource>
 	</resources>
 	
 	<settings>
@@ -254,13 +182,14 @@
 		<default_cooldown_worker_overlay_color>0, 0, 0, 100</default_cooldown_worker_overlay_color>
 		<background_color>90,90,160</background_color>
 		<worker_sprite_path>worker.png</worker_sprite_path>
-		<debugging>true</debugging>
+		<debugging>false</debugging>
 		<time_multiplier>2.0</time_multiplier>
 		<window_width>800.0</window_width>
 		<window_height>600.0</window_height>
+		<autosave_time>30</autosave_time>
 		<mq_width>200.0</mq_width>
 		<mq_text_size>14.0</mq_text_size>
-		<mq_lifetime>10</mq_lifetime>
+		<mq_lifetime>15</mq_lifetime>
 		<display_cost_in_tooltip>true</display_cost_in_tooltip>
 	</settings>
 </game>

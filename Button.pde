@@ -49,6 +49,7 @@ class Button
     textSize(text_height);
     h = floor(text_height * 1.5f);
     w = floor(textWidth(words)) + h;
+    x = y = -1000.0f;
     
     if (_w > w)
       w = _w;
@@ -321,6 +322,7 @@ class Button
         {
           //'get back' everything this crewmember paid for
           workers.get(myworkers.get(i)).return_click_stuff();
+          workers.get(myworkers.get(i)).assigned = false;
         }
         myworkers.clear();
         

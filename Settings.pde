@@ -17,6 +17,8 @@ class Settings
   float window_width;
   float window_height;
   
+  float autosave_time;
+  
   float mq_width;
   float mq_text_size;
   float mq_lifetime;

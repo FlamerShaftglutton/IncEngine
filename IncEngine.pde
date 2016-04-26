@@ -54,36 +54,73 @@ void setup()
 
 void draw()
 {
-  int ctime = millis();
-  
+  //fill in the background
   fill(settings.background_color);
   rect(0,0,settings.window_width,settings.window_height);
   
+  //calculate the time delta since the last frame
+  int ctime = millis();
   float delta = settings.time_multiplier * float(ctime - ptime) / 1000.0f;
   
-  float y = settings.default_text_size * 3;
-  for (Button b : tabs[current_tab_index].buttons)
+  //update and display the tab contents
+  int num_tabs_visible = 0;
+  for (int i = 0; i < tabs.length; i++)
   {
-    b.update(delta);
+    tabs[i].update(delta);
     
-    if (b.visible && b.hideuntil == null && !b.always_invisible)
-    {
-      b.y = y;
-      y += settings.default_text_size * 2.0f;
-      
-      
-    }
-    else
-    {
-      b.y = -100.0f;
-    }
-    
-    b.display();
+    if (tabs[i].visible())
+      num_tabs_visible++;
   }
   
+  //if the tab we were currently on suddenly went dark, we need to move to the first visible one
+  if (!tabs[current_tab_index].visible())
+  {
+    current_tab_index = 0;
+    for (int i = 0; i < tabs.length; i++)
+    {
+      if (tabs[i].visible())
+      {
+        current_tab_index = i;
+        break;
+      }
+    }
+    
+    if (settings.debugging)
+      println("Warning: The current tab disappeared, moving to first visible tab.");
+  }
+  
+  tabs[current_tab_index].display(delta);
+  
+  //draw the tab headers (if necessary)
+  if (num_tabs_visible > 1 || settings.debugging)
+  {
+    float yy = settings.default_text_size;
+    float xx = tabs[0].x;
+    
+    textSize(settings.default_text_size);
+    
+    for (int i = 0; i < tabs.length; i++)
+    {
+      if (tabs[i].visible())
+      {
+        //draw the title
+        if (i == current_tab_index)
+          fill(settings.default_text_color);
+        else
+          fill(settings.default_disabled_text_color);
+        
+        text(tabs[i].title, xx, yy);
+        
+        //move xx over for the next title to be drawn
+        xx += textWidth(tabs[i].title) + 3.0f * settings.default_text_size;
+      }
+    }
+  }
+  
+  //display the resources
   noTint();
   fill(settings.default_text_color);
-  y = settings.default_text_size * 2.0f;
+  float y = settings.default_text_size * 2.0f;
   textSize(settings.default_text_size);
   for (Resource r : resources)
   {
@@ -101,6 +138,7 @@ void draw()
     workers.add(new Worker());
   }
   
+  //remove workers (if need be)
   while (workers.size() > num_crew)
   {
     for (int t = 0; t < tabs.length; t++)
@@ -123,6 +161,7 @@ void draw()
     workers.remove(workers.size() - 1);
   }
   
+  //move the workers that are inactive
   int num_inactive = 0;
   for (int i = 0; i < workers.size(); i++)
   {
@@ -140,6 +179,7 @@ void draw()
     }
   }
   
+  //move the worker being dragged around
   if (dragged_worker_index >= 0)
   {
     
@@ -147,11 +187,22 @@ void draw()
     workers.get(dragged_worker_index).y = mouseY - workers.get(dragged_worker_index).h / 2.0f;
   }
   
+  //now actually draw the workers that need drawn
+  IntList assigned_to_current_tab = tabs[current_tab_index].get_workers();
+  for (int i = 0; i < workers.size(); i++)
+  {
+    if (!workers.get(i).assigned || assigned_to_current_tab.hasValue(i))
+      workers.get(i).display();
+  }
+  
   //draw the message queue
   message_queue.display(delta);
   
+  //draw the tooltips of the buttons (which have to be over everything else)
+  tabs[current_tab_index].display_tooltips(delta, mouseX, mouseY);
+  
   //save the game if necessary
-  if (ctime - psavetime > 10000)
+  if (ctime - psavetime > int(settings.autosave_time * 1000.0f))
   {
     psavetime = ctime;
     
@@ -165,6 +216,8 @@ void draw()
     if (settings.debugging)
       println("Done saving, time taken was ", millis() - ctime, " milliseconds");
   }
+  
+  //get ready for the next frame
   ptime = ctime;
 }
 
@@ -174,10 +227,34 @@ void mousePressed()
   
   for (int i = 0; i < workers.size(); i++)
   {
-    if (workers.get(i).clicked(mouseX, mouseY))
+    if (workers.get(i).clicked(mouseX, mouseY) && (!workers.get(i).assigned || tabs[current_tab_index].get_workers().hasValue(i)))
     {
       dragged_worker_index = i;
       break;
+    }
+  }
+  
+  //if we clicked on a tab header
+  if (mouseY >= 0.0f && mouseY < tabs[0].y && mouseX > tabs[0].x && mouseX < tabs[0].x + tabs[0].w)
+  {
+    //run through each visible tab header to see if it was clicked
+    float xx = tabs[0].x;
+    textSize(settings.default_text_size);
+    for (int i = 0; i < tabs.length; i++)
+    {
+      if (tabs[i].visible())
+      {
+        float tw = textWidth(tabs[i].title);
+        
+        if (mouseX >= xx && mouseX <= xx + tw)
+        {
+          current_tab_index = i;
+          
+          break;
+        }
+        
+        xx += tw + 3.0f * settings.default_text_size;
+      }
     }
   }
 }

@@ -27,12 +27,17 @@ void export_resources_to_xml(XML root)
 
 void export_tabs_to_xml(XML root)
 {
-  XML ts = root.addChild("tabs");
+  XML tr = root.addChild("tabs");
   
   for (int t = 0; t < tabs.length; t++)
   {
+    XML ts = tr.addChild("tab");
     ts.addChild("title").setContent(tabs[t].title);
-    ts.addChild("index").setContent(str(t));
+    ts.setInt("index",t);
+    ts.setFloat("x",tabs[t].x);
+    ts.setFloat("y",tabs[t].y);
+    ts.setFloat("width", tabs[t].w);
+    ts.setFloat("height", tabs[t].h);
     
     XML bs = ts.addChild("buttons");
     
@@ -158,6 +163,7 @@ void export_settings_to_xml(XML root)
   s.addChild("time_multiplier").setFloatContent(settings.time_multiplier);
   s.addChild("window_width").setFloatContent(settings.window_width);
   s.addChild("window_height").setFloatContent(settings.window_height);
+  s.addChild("autosave_time").setFloatContent(settings.autosave_time);
   s.addChild("mq_width").setFloatContent(settings.mq_width);
   s.addChild("mq_text_size").setFloatContent(settings.mq_text_size);
   s.addChild("mq_lifetime").setFloatContent(settings.mq_lifetime);

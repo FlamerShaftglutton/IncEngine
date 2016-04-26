@@ -49,16 +49,19 @@ class Tab
       
       for (int i = 0; i < buttons.length; i++)
       {
-        buttons[i].update_position(xx,yy);
-        
-        yy += 2.0f * settings.default_text_size;
+        if (buttons[i].visible)
+        {
+          buttons[i].update_position(xx,yy);
+          
+          yy += 2.0f * settings.default_text_size;
+        }
       }
       
       dirty_flag = false;
     }
   }
   
-  void display(float _delta, float _mouseX, float _mouseY)
+  void display(float _delta)
   {
     //update and draw
     for (int i = 0; i < buttons.length; i++)
@@ -70,7 +73,10 @@ class Tab
         buttons[i].display();
       }
     }
-    
+  }
+  
+  void display_tooltips(float _delta, float _mouseX, float _mouseY)
+  {
     //tooltips
     for (int i = 0; i < buttons.length; i++)
     {
@@ -104,11 +110,27 @@ class Tab
         if (buttons[i].dragged_crew(_worker_index, _mouseX, _mouseY))
         {
           workers.get(_worker_index).assigned = true;
-          break;
         }
       }
     }
     
     dirty_flag = true;
+  }
+  
+  IntList get_workers()
+  {
+    IntList retval = new IntList();
+    
+    for (Button b : buttons)
+    {
+      for (int i = 0 ; i < b.myworkers.size(); i++)
+      {
+        int ii = b.myworkers.get(i);
+        if (!retval.hasValue(ii))
+          retval.append(ii);
+      }
+    }
+    
+    return retval;
   }
 }

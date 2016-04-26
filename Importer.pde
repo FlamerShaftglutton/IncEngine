@@ -11,6 +11,21 @@ void import_from_xml(String _filename)
   import_resources_from_xml(xresources);
   import_workers_from_xml(xworkers);
   import_tabs_from_xml(xtabs == null ? xml.getChild("buttons") : xtabs);
+  
+  //now that we have imported everything, update a few things
+  for (int t = 0; t < tabs.length; t++)
+  {
+    //figure out which workers are where
+    IntList il = tabs[t].get_workers();
+    
+    for (int i = 0; i < il.size(); i++)
+    {
+      workers.get(il.get(i)).assigned = true;
+    }
+    
+    //tell every tab to update its formatting
+    tabs[t].dirty_flag = true;
+  }
 }
 
 void import_settings_from_xml(XML xml)
@@ -29,6 +44,7 @@ void import_settings_from_xml(XML xml)
   float time_multiplier = 1.0f;
   float window_width = 1000.0f;
   float window_height = 800.0f;
+  float autosave_time = 10.0f;
   float mq_width = 100.0f;
   float mq_text_size = 14.0f;
   float mq_lifetime = 10.0f;
@@ -70,6 +86,8 @@ void import_settings_from_xml(XML xml)
         window_width = kid.getFloatContent();
       else if (n.equals("window_height"))
         window_height = kid.getFloatContent();
+      else if (n.equals("autosave_time"))
+        autosave_time = kid.getFloatContent();
       else if (n.equals("mq_width"))
         mq_width = kid.getFloatContent();
       else if (n.equals("mq_text_size"))
@@ -96,6 +114,7 @@ void import_settings_from_xml(XML xml)
   settings.time_multiplier = time_multiplier;
   settings.window_width = window_width;
   settings.window_height = window_height;
+  settings.autosave_time = autosave_time;
   settings.mq_width = mq_width;
   settings.mq_text_size = mq_text_size;
   settings.mq_lifetime = mq_lifetime;
@@ -160,8 +179,12 @@ void import_tabs_from_xml(XML xml)
     XML[] xbuttons = xtabs[t].getChild("buttons").getChildren("button");
     
     Button[] butts = new Button[xbuttons.length];
-    String ttitle = xml.getChild("title") == null ? "" : xml.getChild("title").getContent();
-    int tindex = xml.getChild("index") == null ? t : xml.getChild("index").getIntContent();
+    String ttitle = xtabs[t].getChild("title") == null ? "" : xtabs[t].getChild("title").getContent();
+    int tindex = xtabs[t].getInt("index",t);
+    float tx = xtabs[t].getFloat("x",settings.mq_width);
+    float ty = xtabs[t].getFloat("y",settings.default_text_size * 2.0f);
+    float tw = xtabs[t].getFloat("width",settings.window_width / 3.0f);
+    float th = xtabs[t].getFloat("height", settings.window_height * 0.75f);
     
     for (int i = 0; i < xbuttons.length; i++)
     {
@@ -307,7 +330,7 @@ void import_tabs_from_xml(XML xml)
       butts[i].myworkers = worker_list;
     }
     
-    tabs[tindex] = new Tab(ttitle, butts);
+    tabs[tindex] = new Tab(ttitle, butts, tx, ty, tw, th);
   }
 }
 
