@@ -166,23 +166,31 @@ void draw()
   for (int i = 0; i < workers.size(); i++)
   {
     if (!workers.get(i).assigned)
+      num_inactive++;
+  }
+  
+  float xx = 50.0f;
+  for (int i = 0; i < workers.size(); i++)
+  {
+    if (!workers.get(i).assigned)
     {
       //return anything they may have spent at their last button position
       workers.get(i).return_click_stuff();
       
       //reposition it at the bottom of the screen
-      workers.get(i).x = 50.0f + num_inactive * 1.5f * workers.get(i).w;
+      workers.get(i).x = xx;
+      
+      if (num_inactive < 10)
+        xx += 1.5f * workers.get(i).w;
+      
       workers.get(i).y = height - 50.0f - workers.get(i).w;
       workers.get(i).active = false;
-      
-      num_inactive++;
     }
   }
   
   //move the worker being dragged around
   if (dragged_worker_index >= 0)
   {
-    
     workers.get(dragged_worker_index).x = mouseX - workers.get(dragged_worker_index).w / 2.0f;
     workers.get(dragged_worker_index).y = mouseY - workers.get(dragged_worker_index).h / 2.0f;
   }
@@ -191,8 +199,23 @@ void draw()
   IntList assigned_to_current_tab = tabs[current_tab_index].get_workers();
   for (int i = 0; i < workers.size(); i++)
   {
-    if (!workers.get(i).assigned || assigned_to_current_tab.hasValue(i))
+    if ((!workers.get(i).assigned && num_inactive < 10) || assigned_to_current_tab.hasValue(i))
       workers.get(i).display();
+  }
+  
+  //draw the inactive worker count if it was too high
+  if (num_inactive >= 10)
+  {
+    int i;
+    for (i = 0; i < workers.size() && (workers.get(i).assigned || i == dragged_worker_index); i++);
+    workers.get(i).display();
+    
+    fill(settings.default_text_color);
+    textSize(settings.default_text_size);
+    text("x" + num_inactive, workers.get(i).x + workers.get(i).w * 2.25f, workers.get(i).y + settings.default_text_size);
+    
+    if (dragged_worker_index >= 0)
+      workers.get(dragged_worker_index).display();
   }
   
   //draw the message queue
@@ -261,14 +284,28 @@ void mousePressed()
 
 void mouseReleased()
 {
-  if (dragged_worker_index >= 0)
+  if (mouseButton == LEFT)
   {
-    tabs[current_tab_index].dragged_worker(dragged_worker_index, mouseX, mouseY);
-    
-    dragged_worker_index = -1;
+    if (dragged_worker_index >= 0)
+    {
+      tabs[current_tab_index].dragged_worker(dragged_worker_index, mouseX, mouseY);
+      
+      dragged_worker_index = -1;
+    }
+    else
+    {
+      tabs[current_tab_index].clicked(mouseX, mouseY);
+    }
   }
-  else
+  else if (mouseButton == RIGHT)
   {
-    tabs[current_tab_index].clicked(mouseX, mouseY);
+    //find an unassigned worker
+    int free_worker;
+    for (free_worker = 0; free_worker < workers.size() && workers.get(free_worker).assigned; free_worker++);
+    
+    if (free_worker < workers.size())
+    {
+      tabs[current_tab_index].dragged_worker(free_worker, mouseX, mouseY);
+    }
   }
 }

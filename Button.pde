@@ -310,6 +310,16 @@ class Button
       //check if the hideuntils have been met
       if (hideafter.met())
       {
+        //return everything the user put in
+        if (cooldown != null && converter != null && converter.click != null && cooldown.current_amount > 0.0f)
+        {
+          for (int j = 0; j < converter.click.types.length; j++)
+          {
+            resources[converter.click.types[j]].add_value(-converter.click.values[j].evaluate());
+          }
+        }
+        
+        //set our flags
         hideafter = null;
         visible = false;
         hideuntil = null;

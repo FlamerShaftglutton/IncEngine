@@ -128,7 +128,7 @@ class ResourceSet
               String s = t;
               while (i + 1 < _tokens.length && is_letter(_tokens[i + 1].charAt(0)))
               {
-                t += " " + _tokens[i + 1];
+                s += " " + _tokens[i + 1];
                 i++;
               }
               

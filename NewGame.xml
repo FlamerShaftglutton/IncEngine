@@ -9,8 +9,16 @@
 					<click>-1 Player, -5 Money</click>
 					<reset>1 Player, 20 Paper</reset>
 					<cooldown>5</cooldown>
-					<hideafter>1 Fluff, 1 Fabric</hideafter>
+					<hideafter>1 Fluff, 1 Fabric, 1 Vertical Monopoly</hideafter>
 					<tooltip>Pick up some more paper for making gift cards.</tooltip>
+				</button>
+				<button>
+					<title>Make Paper</title>
+					<click>-1 Player</click>
+					<reset>1 Player, 5 Paper</reset>
+					<cooldown>5</cooldown>
+					<hideuntil all="true">1 Paper, 1 Vertical Monopoly</hideuntil>
+					<tooltip>Make your own paper to increase profits.</tooltip>
 				</button>
 				<button>
 					<title>Make a greeting card</title>
@@ -62,16 +70,33 @@
 					<click>-1 Player, -20 Money</click>
 					<reset>1 Player, 10 Fabric</reset>
 					<cooldown>5</cooldown>
-					<hideafter>1 Paper</hideafter>
+					<hideafter>1 Paper, 1 Vertical Monopoly</hideafter>
 					<tooltip>Combine this with some fluff and you could sew something cute!</tooltip>
+				</button>
+				<button>
+					<title>Make Fabric</title>
+					<click>-1 Player</click>
+					<reset>1 Player, 4 Fabric</reset>
+					<cooldown>5</cooldown>
+					<hideuntil all="true">1 Fabric, 1 Vertical Monopoly</hideuntil>
+					<tooltip>Make your own fabric to increase profits.</tooltip>
 				</button>
 				<button>
 					<title>Buy Fluff</title>
 					<click>-1 Player, -10 Money</click>
 					<reset>1 Player, 10 Fluff</reset>
 					<cooldown>5</cooldown>
-					<hideafter>1 Paper, 1 Sweatshop</hideafter>
+					<hideafter>1 Paper, 1 Sweatshop, 1 Vertical Monopoly</hideafter>
 					<tooltip>Combine this with some fabric and you could sew something cute!</tooltip>
+				</button>
+				<button>
+					<title>Make Fluff</title>
+					<click>-1 Player</click>
+					<reset>1 Player, 10 Fluff</reset>
+					<cooldown>5</cooldown>
+					<hideuntil all="true">1 Vertical Monopoly, 1 Fluff</hideuntil>
+					<hideafter>1 Sweatshop</hideafter>
+					<tooltip>Make your own fluff to increase profits.</tooltip>
 				</button>
 				<button>
 					<title>Make a Penguin Plushie</title>
@@ -117,7 +142,7 @@
 					<tooltip>Shift your business to making shirts instead of plushies.</tooltip>
 				</button>
 				
-				<!-- All Branches -->
+				<!-- Both Branches -->
 				<button>
 					<title>Hire an employee</title>
 					<click>-1 Player, -100 Money</click>
@@ -139,15 +164,291 @@
 			</buttons>
 		</tab>
 		<tab index="1">
-			<title>Zoo</title>
+			<title>Exhibit</title>
 			<buttons>
 				<button>
-					<title>Coming soon!</title>
-					<click>-1 Player</click>
-					<reset>1 Player</reset>
-					<cooldown>10</cooldown>
+					<title>Buy a dirty zoo exhibit</title>
+					<click>-1 Player, -1200 Money</click>
+					<reset message="You've bought a dirty exhibit. With some cleaning it might be useful...">1 Player, 1 Dirty Exhibit</reset>
+					<cooldown>30</cooldown>
 					<hideuntil>1 Bindery, 1 Sweatshop</hideuntil>
-					<tooltip>This does nothing yet, but stayed tuned!</tooltip>
+					<hideafter>1 Dirty Exhibit</hideafter>
+					<tooltip>It's not good for anything as is, but maybe with some cleaning...</tooltip>
+				</button>
+				<button>
+					<title>Clean out the zoo exhibit</title>
+					<click>-1 Player, -1 Dirty Exhibit</click>
+					<reset message="The exhibit is now ready for occupants!">1 Player, 1 Exhibit</reset>
+					<cooldown>30</cooldown>
+					<hideuntil>1 Dirty Exhibit</hideuntil>
+					<hideafter>1 Exhibit</hideafter>
+					<tooltip>Turn that dirty exhibit into a less-dirty exhibit!</tooltip>
+				</button>
+				<button>
+					<title>Adopt a penguin</title>
+					<click>-1 Player, -(1500 + 100 * Penguins) Money</click>
+					<reset message="You've adopted a penguin. She's so cute!">1 Player, 1 Penguin, 1 Ticket</reset>
+					<cooldown>6</cooldown>
+					<hideuntil>1 Exhibit</hideuntil>
+					<hideafter>10 Penguins</hideafter>
+					<tooltip>Get a cute penguin for your exhibit.</tooltip>
+				</button>
+				<button>
+					<title>Sell Penguin Tickets</title>
+					<click>-1 Player, -1 Ticket</click>
+					<reset>1 Player, (5 + Penguins) Money, 1 Ticket</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>2 Penguins</hideuntil>
+					<hideafter>1 Zoo, 1 PenguinLand</hideafter>
+					<tooltip>Sell tickets to see your penguins.</tooltip>
+				</button>
+				<button>
+					<title>Expand the exhibit into a full zoo</title>
+					<click message="You are now expanding this exhibit into a full-blown zoo.">-1 Player, -15000 Money</click>
+					<reset message="You've adopted dozens of animals and now you have a whole zoo!">1 Player, 1 Zoo, 15 Animals, 20 Spaces, 5 Free Spaces, 5 Tickets</reset>
+					<cooldown>30</cooldown>
+					<hideuntil>10 Penguins</hideuntil>
+					<hideafter>1 Zoo, 1 PenguinLand</hideafter>
+					<tooltip>Turn that exhibit into a full zoo with dozens of animals.</tooltip>
+				</button>
+				<button>
+					<title>Expand the exhibit into PenguinLand</title>
+					<click message="You are now expanding this exhibit into PenguinLand.">-1 Player, -10000 Money</click>
+					<reset message="You've expanded the exhibit into a full penguin-themed amusement park!">1 Player, 1 PenguinLand, 10 Spaces, 5 Free Spaces, 4 Attractions, -5 Tickets</reset>
+					<cooldown>30</cooldown>
+					<hideuntil>10 Penguins</hideuntil>
+					<hideafter>1 Zoo, 1 PenguinLand</hideafter>
+					<tooltip>Turn that exhibit into an amusement park devoted to penguins.</tooltip>
+				</button>
+				
+				<!-- Zoo Branch -->
+				<button>
+					<title>Buy another animal</title>
+					<click>-1 Player, -(500 * Lower Tariffs) - (1 - Lower Tariffs) * (1000 + 100 * Animals) Money, -1 Free Space</click>
+					<reset>1 Player, 1 Animal, 1 Ticket</reset>
+					<cooldown>6</cooldown>
+					<hideuntil>1 Zoo</hideuntil>
+					<hideafter>200 Animals</hideafter>
+					<tooltip>Adopt another animal for your menagerie.</tooltip>
+				</button>
+				<button>
+					<title>Sell Zoo Tickets</title>
+					<click>-1 Player, -1 Ticket</click>
+					<reset>1 Player, 1 Ticket, 20 * clamp(10 * Horizontal Monopoly,1,10) Money</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>1 Zoo</hideuntil>
+					<tooltip>Make some money off these animals! Traffic is based off of how many animals you own.</tooltip>
+				</button>
+				
+				<!-- PenguinLand Branch -->
+				<button>
+					<title>Build an attraction</title>
+					<click>-1 Player, -(1000 + 500 * Attractions) Money, -1 Free Space</click>
+					<reset>1 Player, 1 Attraction, 1 Ticket</reset>
+					<cooldown>8</cooldown>
+					<hideuntil>1 PenguinLand</hideuntil>
+					<hideafter>100 Attractions</hideafter>
+					<tooltip>Turn some of that empty space into a fun attraction!</tooltip>
+				</button>
+				<button>
+					<title>Build Penguin Housing</title>
+					<click>-1 Player, -1000 Money</click>
+					<reset message="You can now house 20 more penguins than before!">1 Player, 20 Penguin Housing, 20 Free Housing</reset>
+					<cooldown>10</cooldown>
+					<hideuntil>11 Genetic Research</hideuntil>
+					<hideafter>100 Penguin Housing</hideafter>
+					<tooltip>Your new employees have to live somewhere!</tooltip>
+				</button>
+				<button>
+					<title>Sell PenguinLand Tickets</title>
+					<click>-1 Player, -1 Ticket</click>
+					<reset>1 Player, 1 Ticket, (20 + (Genetic Research)) * clamp(10 * Horizontal Monopoly,1,10) Money</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>1 PenguinLand</hideuntil>
+					<tooltip>Rake in the dough. Traffic is based off of how many attractions you own.</tooltip>
+				</button>
+				<button>
+					<title>"Hire" a Penguin Worker</title>
+					<click>-1 Player, -1 Free Housing</click>
+					<reset>1 Player, 1 Crew</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>11 Genetic Research</hideuntil>
+					<hideafter>100 Crew</hideafter>
+				</button>
+
+				<!-- Both Branches -->
+				<button>
+					<title>Acquire more space</title>
+					<click>-1 Player, -(500 * Eminent Domain) - (1 - Eminent Domain) * (4000 + 200 * Spaces) Money</click>
+					<reset>1 Player, 1 Space, 1 Free Space</reset>
+					<cooldown>10</cooldown>
+					<hideuntil>1 Zoo, 1 PenguinLand</hideuntil>
+					<hideafter>30 Spaces</hideafter>
+					<tooltip>Time to expand! Buy up some nearby property.</tooltip>
+				</button>
+				<button>
+					<title>Hire an employee</title>
+					<click>-1 Player, -150 Money</click>
+					<reset>1 Player, 1 Crew</reset>
+					<cooldown>5</cooldown>
+					<hideuntil>1 Zoo, 1 PenguinLand</hideuntil>
+					<hideafter>100 Crew, 1 Genetic Research</hideafter>
+					<tooltip>Hire an employee to help you out.</tooltip>
+				</button>
+				
+				<button>
+					<title>Sell a Card in the Gift Shop</title>
+					<click>-1 Player, -1 Card</click>
+					<reset>1 Player, 2 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>1 Genetic Research, 1 Vertical Monopoly, 1 Lower Tariffs</hideuntil>
+					<hideafter>1 Bindery, 1 Fabric</hideafter>
+					<tooltip>Synergize by selling cards in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Book in the Gift Shop</title>
+					<click>-1 Player, -1 Book</click>
+					<reset>1 Player, 15 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil all="true">1 Genetic Research, 1 Bindery</hideuntil>
+					<hideafter>1 Fabric</hideafter>
+					<tooltip>Synergize by selling books in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Book in the Gift Shop</title>
+					<click>-1 Player, -1 Book</click>
+					<reset>1 Player, 15 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil all="true">1 Vertical Monopoly, 1 Bindery</hideuntil>
+					<hideafter>1 Fabric</hideafter>
+					<tooltip>Synergize by selling books in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Book in the Gift Shop</title>
+					<click>-1 Player, -1 Book</click>
+					<reset>1 Player, 15 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil all="true">1 Lower Tariffs, 1 Bindery</hideuntil>
+					<hideafter>1 Fabric</hideafter>
+					<tooltip>Synergize by selling books in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Plushie in the Gift Shop</title>
+					<click>-1 Player, -1 Plushie</click>
+					<reset>1 Player, 15 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil>1 Genetic Research, 1 Vertical Monopoly, 1 Lower Tariffs</hideuntil>
+					<hideafter>1 Sweatshop, 1 Paper</hideafter>
+					<tooltip>Synergize by selling plushies in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Shirt in the Gift Shop</title>
+					<click>-1 Player, -1 Shirt</click>
+					<reset>1 Player, 25 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil all="true">1 Genetic Research, 1 Sweatshop</hideuntil>
+					<hideafter>1 Paper</hideafter>
+					<tooltip>Synergize by selling penguin shirts in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Shirt in the Gift Shop</title>
+					<click>-1 Player, -1 Shirt</click>
+					<reset>1 Player, 25 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil all="true">1 Vertical Monopoly, 1 Sweatshop</hideuntil>
+					<hideafter>1 Paper</hideafter>
+					<tooltip>Synergize by selling penguin shirts in the giftshop!</tooltip>
+				</button>
+				<button>
+					<title>Sell a Shirt in the Gift Shop</title>
+					<click>-1 Player, -1 Shirt</click>
+					<reset>1 Player, 25 Money</reset>
+					<cooldown>3</cooldown>
+					<hideuntil all="true">1 Lower Tariffs, 1 Sweatshop</hideuntil>
+					<hideafter>1 Paper</hideafter>
+					<tooltip>Synergize by selling penguin shirts in the giftshop!</tooltip>
+				</button>
+			</buttons>
+		</tab>
+		<tab index="2">
+			<title>Lobbying</title>
+			<buttons>
+				<!-- Genetic Modification Branch -->
+				<button>
+					<title>Genetic Modification Laws</title>
+					<click>-1 Player, -50000 Money</click>
+					<reset>1 Player, 1 Genetic Research</reset>
+					<cooldown>30</cooldown>
+					<hideuntil all="true">30 Spaces, 1 PenguinLand</hideuntil>
+					<hideafter>1 Genetic Research, 1 Vertical Monopoly, 1 Lower Tariffs</hideafter>
+					<tooltip>Get the restrictions on genetic modification research removed.</tooltip>
+				</button>
+				<button>
+					<title>Commence Gene Therapy Trial</title>
+					<click message="Research is commencing...">-1 Player, -1 Penguin, -2000 Money</click>
+					<reset message="Your discoveries are ground-breaking!">1 Player, 1 Genetic Research</reset>
+					<cooldown>20</cooldown>
+					<hideuntil>1 Genetic Research</hideuntil>
+					<hideafter>10 Genetic Research</hideafter>
+					<tooltip>Do some genetic research on one of your penguins.</tooltip>
+				</button>
+				<button>
+					<title>Finish Gene Therapy Trials</title>
+					<click message="Applying your findings...">-1 Player, -1 Penguin, -2000 Money</click>
+					<reset message="PenguinLand and your business are now staffed solely with sentient penguins. Ticket sales are through the roof!">1 Genetic Research, 1 Player, 20 Penguin Housing, (20 - Crew) Free Housing</reset>
+					<cooldown>60</cooldown>
+					<hideuntil>10 Genetic Research</hideuntil>
+					<hideafter>11 Genetic Research</hideafter>
+					<tooltip>Time to apply your findings to a whole rookery of penguins.</tooltip>
+				</button>
+				<button>
+					<title>Penguin Rights Laws</title>
+					<click>-1 Player, -500000 Money</click>
+					<reset>1 Player, 1 Penguin Rights</reset>
+					<cooldown>60</cooldown>
+					<hideuntil>11 Genetic Research</hideuntil>
+					<hideafter>1 Penguin Rights</hideafter>
+					<tooltip>Convince Congress to get sentient penguins full citizenship.</tooltip>
+				</button>
+				
+				<!-- Economic Branch -->
+				<button>
+					<title>Vertical Monopoly</title>
+					<click>-1 Player, -100000 Money</click>
+					<reset message="You have bought a Paper manufacturing plant! No more paying for paper!">1  Player, 1 Vertical Monopoly</reset>
+					<cooldown>30</cooldown>
+					<hideuntil>30 Spaces</hideuntil>
+					<hideafter>1 Genetic Research, 1 Vertical Monopoly, 1 Lower Tariffs</hideafter>
+					<tooltip>Integrate a paper manufacturing plant into your business.</tooltip>
+				</button>
+				<button>
+					<title>Horizontal Monopoly</title>
+					<click>-1 Player, -500000 Money</click>
+					<reset message="Your competition is gone. Increased profits!">1 Player, 1 Horizontal Monopoly</reset>
+					<cooldown>60</cooldown>
+					<hideuntil>1 Vertical Monopoly</hideuntil>
+					<hideafter>1 Horizontal Monopoly</hideafter>
+					<tooltip>Convince Congress to elminate those pesky monopoly laws.</tooltip>
+				</button>
+				
+				<!-- Zoo Branch -->
+				<button>
+					<title>Lower Tariffs</title>
+					<click>-1 Player, -80000 Money</click>
+					<reset message="It is now significantly cheaper to import animals. Profits!">1 Player, 1 Lower Tariffs</reset>
+					<cooldown>30</cooldown>
+					<hideuntil all="true">30 Spaces, 1 Zoo</hideuntil>
+					<hideafter>1 Genetic Research, 1 Vertical Monopoly, 1 Lower Tariffs</hideafter>
+					<tooltip>Convince Congress that exotic animals shouldn't be expensive.</tooltip>
+				</button>
+				<button>
+					<title>Eminent Domain</title>
+					<click>-1 Player, -200000 Money</click>
+					<reset message="You now have the power to seize land by paying only minor fees to the owners!">1 Player, 1 Eminent Domain</reset>
+					<cooldown>60</cooldown>
+					<hideuntil>1 Lower Tariffs</hideuntil>
+					<hideafter>1 Eminent Domain</hideafter>
+					<tooltip>Lobby to give your company Eminent Domain rights.</tooltip>
 				</button>
 			</buttons>
 		</tab>
@@ -165,9 +466,30 @@
 		<resource min="1">Plushie, Plushies</resource>
 		<resource min="1">Shirt, Shirts</resource>
 		<resource min="-1">Sweatshop, Sweatshops</resource>
-		<resource value="1">Cart,Carts</resource>
+		<resource value="1">Cart, Carts</resource>
 		<resource min = "-1" value="1">Real Cart, Real Carts</resource>
-		<resource min="-1" value="1">Player,Players</resource>
+		
+		<resource min="-1">Dirty Exhibit, Dirty Exhibits</resource>
+		<resource min="-1">Exhibit, Exhibits</resource>
+		<resource min="1">Penguin, Penguins</resource>
+		<resource min="-1">Ticket, Tickets</resource>
+		<resource min="-1">Zoo, Zoos</resource>
+		<resource min="1">Animal, Animals</resource>
+		<resource min="1">Space, Spaces</resource>
+		<resource min="-1">Free Space, Free Spaces</resource>
+		<resource min="-1">PenguinLand, PenguinLands</resource>
+		<resource min="1">Attraction, Attractions</resource>
+		<resource min="1">Penguin Housing</resource>
+		<resource min="-1">Free Housing</resource>
+		
+		<resource min="-1">Genetic Research</resource>
+		<resource min="-1">Penguin Rights</resource>
+		<resource min="-1">Vertical Monopoly</resource>
+		<resource min="-1">Horizontal Monopoly</resource>
+		<resource min="-1">Lower Tariffs</resource>
+		<resource min="-1">Eminent Domain</resource>
+		
+		<resource min="-1" value="1">Player, Players</resource>
 		<resource min="2">Crew</resource>
 	</resources>
 	
@@ -182,7 +504,7 @@
 		<default_cooldown_worker_overlay_color>0, 0, 0, 100</default_cooldown_worker_overlay_color>
 		<background_color>90,90,160</background_color>
 		<worker_sprite_path>worker.png</worker_sprite_path>
-		<debugging>false</debugging>
+		<debugging>true</debugging>
 		<time_multiplier>2.0</time_multiplier>
 		<window_width>800.0</window_width>
 		<window_height>600.0</window_height>
